@@ -7,7 +7,7 @@ const ICAOFFICER = 0;
 var isRunning = false;
 var surface;
 
-const width = 1920;
+const width = 1280;
 const height = 540;
 
 var probArrival = 0.5;
@@ -134,7 +134,6 @@ function onChange1() {
       positions[position2] = 0;
     }
     redrawWindow();
-    console.log(positions);
   }
 }
 
@@ -162,7 +161,6 @@ function onChange2() {
       positions[position3] = 0;
     }
     redrawWindow();
-    console.log(positions);
   }
 }
 
@@ -190,7 +188,6 @@ function onChange3() {
       positions[position4] = 0;
     }
     redrawWindow();
-    console.log(positions);
   }
 }
 
@@ -732,10 +729,10 @@ function updatePassenger(index) {
     case "baggage":
       if (queueState == "baggageQueue" && hasArrived) {
         if (col == Number(objects[queueState][chosenQueue].col) + 100) {
-          passenger.queueState = "gettingBaggage";
-          passenger.targetCol = Number(objects.baggage[chosenQueue].col) - 1;
           let newStack = Number(objects.baggageQueue[chosenQueue].stack) - 1;
           objects.baggageQueue[chosenQueue].stack = newStack;
+          passenger.queueState = "gettingBaggage";
+          passenger.targetCol = Number(objects.baggage[0].col) - 1;
           // objects.testing[chosenQueue].state = "BUSY";
         } else if (col < Number(objects[queueState][chosenQueue].col) + 100) {
           let filledCol = objects.passengers.filter(function (i) {
@@ -855,9 +852,7 @@ function updatePassenger(index) {
       break;
     case "covid":
       if (hasArrived) {
-        console.log(passenger);
         passenger.state = "exiting";
-        console.log(passenger.state);
       }
   }
 
