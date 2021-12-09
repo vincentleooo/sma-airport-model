@@ -11,7 +11,9 @@ const width = 1920;
 const height = 540;
 
 var probArrival = 0.3;
-var probImmigration = 0.1;
+var probImmigration = 0.2;
+var probTesting = 0.1;
+var testingTime = 20;
 
 var positions = {
   arrivals: 0,
@@ -324,6 +326,7 @@ function addDynamicAgents() {
       targetRow: Number(objects[queueState][chosenQueue].row) + 3,
       targetCol: Number(objects[queueState][chosenQueue].col) - stackOverflow,
       station: station,
+      timeWaited: 0,
     };
     objects.passengers.push(newPassenger);
     let newStack = Number(objects[queueState][chosenQueue].stack) + 1;
@@ -441,6 +444,7 @@ function updatePassenger(index) {
             passenger.queueState = queueState;
 
             function chosenQueueRectifier(chosenQueue) {
+              //* Recursive function when having mismatched station lengths.
               if (chosenQueue >= objects[queueState].length) {
                 chosenQueue -= 1;
                 return chosenQueueRectifier(chosenQueue);
@@ -483,9 +487,137 @@ function updatePassenger(index) {
       console.log(state);
       console.log(queueState);
       break;
-    // case "testing":
-    //   if ()
-    //   break;
+    case "testing":
+      if (queueState == "testingQueue" && hasArrived) {
+        if (
+          col == Number(objects[queueState][chosenQueue].col) + 100 &&
+          objects.testing[chosenQueue].state == "IDLE"
+        ) {
+          passenger.queueState = "testBox";
+          passenger.targetRow =
+            Number(objects.testing[chosenQueue].row) + 3;
+          passenger.targetCol =
+            Number(objects.testing[chosenQueue].col) - 1;
+          let newStack =
+            Number(objects.testingQueue[chosenQueue].stack) - 1;
+          objects.testingQueue[chosenQueue].stack = newStack;
+          objects.testing[chosenQueue].state = "BUSY";
+        } else if (col < Number(objects[queueState][chosenQueue].col) + 100) {
+          let filledCol = objects.passengers.filter(function (i) {
+            return i.col == col + 1 && i.row == row;
+          });
+
+          if (filledCol.length == 0) {
+            passenger.targetCol = col + 1;
+          }
+        }
+      } else if (queueState == "testBox" && hasArrived) {
+        if (Math.random() < probTesting) {
+          passenger.queueState = "enteringTestBox";
+          passenger.targetCol =
+            Number(objects.testingBox[0].col) - 1;
+          objects.testing[chosenQueue].state = "IDLE";
+        }
+      } else if (queueState == "enteringTestBox" && hasArrived) {
+        let boxWidth = Number(objects.testingBox[0].width);
+        let boxHeight = Number(objects.testingBox[0].height);
+        let boxRow = Number(objects.testingBox[0].row);
+        let boxCol = Number(objects.testingBox[0].col);
+        let newCol;
+        let newRow;
+
+        let overlapping = true;
+        while (overlapping) {
+          let count = 1;
+          let randRow = Math.floor(Math.random() * boxHeight);
+          let randCol = Math.floor(Math.random() * boxWidth);
+          newRow = boxRow + randRow;
+          newCol = boxCol + randCol;
+
+          let overlappedList = objects.passengers.filter(function (d) {
+            return (d.targetRow == newRow) && (d.targetCol == newCol)
+          })
+
+          if (overlappedList.length == 0) {
+            overlapping = false;
+          }
+
+          // ! DEFINE BEHAVIOUR WHEN BOX IS FULL (UNLIKELY, BUT STILL).
+          // * FOR NOW, IF BOX IS FULL, ALLOW OVERLAP.
+          if (count > (boxWidth * boxHeight)) {
+            overlapping = false;
+          }
+        }
+
+        passenger.targetCol = newCol;
+        passenger.targetRow = newRow;
+        passenger.queueState = "waiting"
+      } else if (queueState == "waiting" && hasArrived) {
+        passenger.timeWaited = Number(passenger.timeWaited) + 1;
+        if (passenger.timeWaited >= testingTime) {
+          let station = Number(passenger.station);
+          station += 1;
+          let newState = getKeyByValue(positions, station);
+          if (newState == undefined) {
+            newState = getKeyByValue(positions, station + 1);
+            station += 1;
+            if (newState == undefined) {
+              newState = getKeyByValue(positions, station + 1);
+              station += 1;
+            } // Final state if nothing else will be "out".
+          }
+
+          if (newState == "exiting") {
+            passenger.state = "exiting";
+            passenger.targetCol = width;
+            passenger.targetRow = height / 2;
+          } else {
+            passenger.state = newState;
+            queueState = newState + "Queue";
+            passenger.queueState = queueState;
+
+            function chosenQueueRectifier(chosenQueue) {
+              //* Recursive function when having mismatched station lengths.
+              if (chosenQueue >= objects[queueState].length) {
+                chosenQueue -= 1;
+                return chosenQueueRectifier(chosenQueue);
+              } else {
+                return chosenQueue;
+              }
+            }
+
+            chosenQueue = chosenQueueRectifier(chosenQueue);
+
+            for (let i in objects[queueState]) {
+              if (i !== chosenQueue) {
+                if (
+                  Number(objects[queueState][i].stack) <
+                  Number(objects[queueState][chosenQueue].stack)
+                ) {
+                  chosenQueue = Number(i);
+                }
+              }
+            }
+
+            let stackOverflow = 0;
+
+            if (Number(objects[queueState][chosenQueue].stack) > 100) {
+              stackOverflow =
+                Number(objects[queueState][chosenQueue].stack) - 100;
+            }
+
+            passenger.targetRow =
+              Number(objects[queueState][chosenQueue].row) + 3;
+            passenger.targetCol =
+              Number(objects[queueState][chosenQueue].col) - stackOverflow;
+            passenger.station = station;
+            passenger.chosenQueue = chosenQueue;
+            let newStack = Number(objects[queueState][chosenQueue].stack) + 1;
+            objects[queueState][chosenQueue].stack = newStack;
+          }
+        }
+      }
+      break;
     case "exiting":
       if (hasArrived) {
         passenger.state = "out";
@@ -660,6 +792,17 @@ function redrawWindow() {
     })
     .attr("fill", "transparent")
     .attr("stroke", "palevioletred");
+  
+  newTestingBoxes
+    .append("text")
+    .attr("x", function (d) {
+      return Number(d.col) + "px";
+    })
+    .attr("y", function (d) {
+      return Number(d.row) + 10 + Number(d.height) + "px";
+    })
+    .attr("dy", ".35em")
+    .text("Waiting Area");
 
   newTestingQueues
     .append("svg")
