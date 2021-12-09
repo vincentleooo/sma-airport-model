@@ -1,0 +1,144 @@
+@font-face {
+  font-family: "Graphik";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local("Graphik-Regular"),
+    url("fonts/Graphik/Graphik-Regular.woff2") format("woff2"),
+    url("fonts/Graphik/Graphik-Regular.woff") format("woff");
+}
+
+/* source-sans-pro-600 */
+@font-face {
+  font-family: "Graphik";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local("Graphik-Medium"),
+    url("fonts/Graphik/Graphik-Medium.woff2") format("woff2"),
+    url("fonts/Graphik/Graphik-Medium.woff") format("woff");
+}
+
+/* source-sans-pro-700 */
+@font-face {
+  font-family: "Graphik";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local("Graphik-Bold"),
+    url("fonts/Graphik/Graphik-Bold.woff2") format("woff2"),
+    url("fonts/Graphik/Graphik-Bold.woff") format("woff");
+}
+
+.wrapper {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: 1fr;
+  font-family: "Graphik";
+}
+
+nav {
+  border-bottom: 1px solid black;
+}
+
+.crumbs ul {
+  display: flex;
+  list-style-type: none;
+  padding-left: 0;
+  /* justify-content: space-between; */
+}
+
+.crumb {
+  display: inline-block;
+}
+
+.crumbs li {
+  font-size: small;
+  display: inline-block;
+  height: 100%;
+  padding-right: 2rem;
+}
+
+.crumbs a {
+  color: black;
+  text-decoration: none;
+}
+
+.crumbs a:hover {
+  color: rebeccapurple;
+}
+
+.footer p {
+  text-align: center;
+  font-size: x-small;
+}
+
+.wrapper {
+  max-width: 960px;
+  width: 90%;
+  margin: 0 auto !important;
+  float: none !important;
+}
+
+h2 {
+  font-family: "Graphik";
+  color: black;
+}
+
+p,
+ul {
+  font-family: "Graphik";
+}
+
+.simulate {
+  text-align: center;
+}
+
+.button {
+  font-size: medium;
+}
+
+label {
+  font-size: small;
+}
+
+.selections select {
+  display: list-item;
+}
+
+.parameters select {
+  display: list-item;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 50%;
+  border-radius: 10px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rebeccapurple;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rebeccapurple;
+  cursor: pointer;
+}
+
+.slidecontainer output {
+	font-size: small;
+}

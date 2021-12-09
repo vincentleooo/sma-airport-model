@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="styles/stylesheet.css" />
+    <title>SMA Project</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div>
+        <nav class="crumbs">
+          <ul>
+            <li class="crumb">
+              <a href="https://vinleonardo.com">Main Page</a>
+            </li>
+            <li class="crumb">
+              <a href="https://github.com/vincentleooo">GitHub Projects</a>
+            </li>
+          </ul>
+        </nav>
+
+        <h2>
+          Agent-Based Modelling for Airport Arrivals in a Post-Pandemic World
+        </h2>
+
+        <p> Instructions:
+          <ol>
+            <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio modi hic, expedita soluta ducimus sint facere mollitia. Odit laborum quaerat aperiam id cum quidem fugiat atque, totam hic! Molestias, maiores.</li>
+            <li>Facilis aspernatur at quisquam? Quidem, doloremque id. Optio eum a consequuntur quas magni reiciendis accusantium fugiat recusandae vero architecto nam assumenda accusamus amet dolorem natus, quam, harum maiores nulla iusto.</li>
+            <li>Ipsa, nihil in. Deserunt, voluptatibus esse? Ad, libero cum. Expedita molestiae culpa laboriosam adipisci sit illo nulla dolorum, perferendis molestias ut necessitatibus est error amet quis eos. Quos, laboriosam velit.</li>
+          </ol>
+        </p>
+
+        <div id="main" class="main">
+          <svg
+            id="surface"
+            style="width:100% height:100%"
+            xmlns="http://www.w3.org/2000/svg"
+            version="1.1"
+            viewBox="0 0 1920 540"
+            preserveAspectRatio="xMidYMid meet"
+            ></svg>
+          </div>
+          
+          <div class="simulate">
+            <button class="button" onclick="runSim()">Start</button>
+            <button class="button" onclick="pause()">Pause</button>
+            <button class="button" onclick="redrawWindow()">Reset</button>
+          </div>
+
+          <div class="selections">
+          <p>Stations</p>
+          <label for="select1">Station 1:</label>
+  
+          <select name="choices1" id="select1" onchange="onChange1()">
+            <option value="none">None</option>
+            <option value="immigration">Immigration</option>
+            <option value="testing">Testing</option>
+            <option value="baggage">Baggage</option>
+          </select>
+          
+          <label for="select2">Station 2:</label>
+  
+          <select name="choices2" id="select2" onchange="onChange2()">
+            <option value="none">None</option>
+            <option value="immigration">Immigration</option>
+            <option value="testing">Testing</option>
+            <option value="baggage">Baggage</option>
+          </select>
+          
+          <label for="select3">Station 3:</label>
+  
+          <select name="choices3" id="select3" onchange="onChange3()">
+            <option value="none">None</option>
+            <option value="immigration">Immigration</option>
+            <option value="testing">Testing</option>
+            <option value="baggage">Baggage</option>
+          </select>
+          <br>
+        </div>
+
+        <div class="parameters">
+          <p>Parameters</p>
+          <label for="arrivalRate">Arrival rate:</label>
+          <div class="slidecontainer">
+            <input type="range" min="1" max="100" value="50" class="slider" id="arrivalRate" onchange="updateTextInput(this.value)">
+            <output type="text" id="textInput" value="50">
+          </div>
+          
+          <label for="immigrationNum">Number of immigration booths:</label>
+          <select name="immigrationNum" id="immigrationNum" onchange="numImmigrationOfficersChange()">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+
+          <label for="testingNum">Number of testing booths:</label>
+          <select name="testingNum" id="testingNum" onchange="numTestingDoctorsChange()">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+
+      </div>
+
+      <footer class="footer">
+        <p>
+          Copyright 2021 by Vincent Leonardo, Sarah Wong, and Sarah Ramjoo. All
+          rights reserved.
+        </p>
+      </footer>
+    </div>
+
+    <script src="./model.js"></script>
+  </body>
+</html>
