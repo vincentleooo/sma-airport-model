@@ -142,3 +142,13 @@ label {
 .slidecontainer output {
 	font-size: small;
 }
+
+.inputs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+#time {
+  font-size: small;
+}

@@ -1,5 +1,5 @@
 var currentTime = 0;
-var animationDelay = 25;
+var animationDelay = 20;
 var cellsPerStep = 1;
 const IDLE = 0;
 const BUSY = 1;
@@ -10,12 +10,28 @@ var surface;
 const width = 1920;
 const height = 540;
 
-var probArrival = 0.3;
-var probImmigration = 0.2;
-var probTesting = 0.1;
-var testingTime = 20;
-var probCovid = 0.05;
-var probFindBaggage = 0.1;
+var probArrival = 0.5;
+var probImmigration = 0.5;
+var probTesting = 0.5;
+var testingTime = 40;
+var probCovid = 0.5;
+var probFindBaggage = 0.5;
+
+function changeProb() {
+  if (isRunning) {
+    alert(
+      "Please stop the model first before changing this parameter. Changing the parameter will reset the simulation."
+    );
+  } else {
+    probArrival = Number(document.getElementById("probArrival").value);
+    probImmigration = Number(document.getElementById("probImmigration").value);
+    probTesting = Number(document.getElementById("probTesting").value);
+    probCovid = Number(document.getElementById("probCOVID").value);
+    testingTime = Number(document.getElementById("timeTest").value);
+    probFindBaggage = Number(document.getElementById("probBaggage").value);
+    animationDelay = Number(document.getElementById("animationDelay").value);
+  }
+}
 
 var positions = {
   arrivals: 0,
@@ -41,7 +57,7 @@ var objects = {
 
 var numImmigrationOfficers = 1;
 var numTestingDoctors = 1;
-var numBaggageQueues = 5;
+var numBaggageQueues = 1;
 
 function updateTextInput(val) {
   document.getElementById("textInput").value = val;
@@ -77,6 +93,19 @@ function numTestingDoctorsChange() {
     numTestingDoctors = Number(
       document.getElementsByName("testingNum")[0].value
     );
+    redrawWindow();
+  }
+}
+
+function numBaggageQueuesChange() {
+  if (isRunning) {
+    alert(
+      "Please stop the model first before changing this parameter. Changing the parameter will reset the simulation."
+    );
+    let select = document.querySelector("#queueNum");
+    select.value = String(numBaggageQueues);
+  } else {
+    numBaggageQueues = Number(document.getElementsByName("queueNum")[0].value);
     redrawWindow();
   }
 }
@@ -702,9 +731,7 @@ function updatePassenger(index) {
       break;
     case "baggage":
       if (queueState == "baggageQueue" && hasArrived) {
-        if (
-          col == Number(objects[queueState][chosenQueue].col) + 100
-        ) {
+        if (col == Number(objects[queueState][chosenQueue].col) + 100) {
           passenger.queueState = "gettingBaggage";
           passenger.targetCol = Number(objects.baggage[chosenQueue].col) - 1;
           let newStack = Number(objects.baggageQueue[chosenQueue].stack) - 1;
@@ -856,7 +883,10 @@ function redrawWindow() {
    * TODO Draw all the specified stations.
    */
   currentTime = 0;
+  document.getElementById("time").innerHTML =
+    "Current time is " + currentTime + ".";
   isRunning = false;
+  changeProb();
   var drawSurface = document.getElementById("surface");
   drawSurface.style.border = "thin solid #333333";
   d3.select("#surface").selectAll("*").remove();
@@ -896,9 +926,7 @@ function redrawWindow() {
     .selectAll(".testingQueue")
     .data(objects.testingQueue);
 
-  var allBaggageAreas = surface
-    .selectAll(".baggageArea")
-    .data(objects.baggage);
+  var allBaggageAreas = surface.selectAll(".baggageArea").data(objects.baggage);
 
   var allBaggageAreaQueues = surface
     .selectAll(".baggageAreaQueue")
@@ -1113,6 +1141,8 @@ function removeDynamicAgents() {
 function simStep() {
   if (isRunning) {
     currentTime += 1;
+    document.getElementById("time").innerHTML =
+      "Current time is " + currentTime + ".";
     removeDynamicAgents();
     addDynamicAgents();
     updateDynamicAgents();
@@ -1124,10 +1154,22 @@ function runSim() {
   let choice2 = document.getElementsByName("choices2")[0].value;
   let choice3 = document.getElementsByName("choices3")[0].value;
 
+  changeProb();
+
   if (choice1 == "none" && choice2 == "none" && choice3 == "none") {
     alert("Please make at least one station choice.");
   } else if (isRunning) {
     alert("Already running.");
+  } else if (
+    isNaN(probArrival) ||
+    isNaN(probCovid) ||
+    isNaN(probImmigration) ||
+    isNaN(probTesting) ||
+    isNaN(probFindBaggage) ||
+    isNaN(testingTime) ||
+    isNaN(animationDelay)
+  ) {
+    alert("At least one of the probabilities is not a number.");
   } else {
     isRunning = true;
     simTimer = window.setInterval(simStep, animationDelay);

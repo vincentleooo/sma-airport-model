@@ -26,13 +26,15 @@
           Agent-Based Modelling for Airport Arrivals in a Post-Pandemic World
         </h2>
 
-        <p> Instructions:
+        <!-- <p> Instructions:
           <ol>
             <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio modi hic, expedita soluta ducimus sint facere mollitia. Odit laborum quaerat aperiam id cum quidem fugiat atque, totam hic! Molestias, maiores.</li>
             <li>Facilis aspernatur at quisquam? Quidem, doloremque id. Optio eum a consequuntur quas magni reiciendis accusantium fugiat recusandae vero architecto nam assumenda accusamus amet dolorem natus, quam, harum maiores nulla iusto.</li>
             <li>Ipsa, nihil in. Deserunt, voluptatibus esse? Ad, libero cum. Expedita molestiae culpa laboriosam adipisci sit illo nulla dolorum, perferendis molestias ut necessitatibus est error amet quis eos. Quos, laboriosam velit.</li>
           </ol>
-        </p>
+        </p> -->
+
+        <p id="time"></p>
 
         <div id="main" class="main">
           <svg
@@ -42,83 +44,196 @@
             version="1.1"
             viewBox="0 0 1920 540"
             preserveAspectRatio="xMidYMid meet"
-            ></svg>
-          </div>
-          
-          <div class="simulate">
-            <button class="button" onclick="runSim()">Start</button>
-            <button class="button" onclick="pause()">Pause</button>
-            <button class="button" onclick="redrawWindow()">Reset</button>
-          </div>
+          ></svg>
+        </div>
 
+        <div class="simulate">
+          <button class="button" onclick="runSim()">Start</button>
+          <button class="button" onclick="pause()">Pause</button>
+          <button class="button" onclick="clearInterval(simTimer);redrawWindow();">Reset</button>
+        </div>
+
+        <div class="inputs">
           <div class="selections">
-          <p>Stations</p>
-          <label for="select1">Station 1:</label>
-  
-          <select name="choices1" id="select1" onchange="onChange1()">
-            <option value="none">None</option>
-            <option value="immigration">Immigration</option>
-            <option value="testing">Testing</option>
-            <option value="baggage">Baggage</option>
-          </select>
-          
-          <label for="select2">Station 2:</label>
-  
-          <select name="choices2" id="select2" onchange="onChange2()">
-            <option value="none">None</option>
-            <option value="immigration">Immigration</option>
-            <option value="testing">Testing</option>
-            <option value="baggage">Baggage</option>
-          </select>
-          
-          <label for="select3">Station 3:</label>
-  
-          <select name="choices3" id="select3" onchange="onChange3()">
-            <option value="none">None</option>
-            <option value="immigration">Immigration</option>
-            <option value="testing">Testing</option>
-            <option value="baggage">Baggage</option>
-          </select>
-          <br>
+            <p><strong>Stations</strong></p>
+            <label for="select1">Station 1:</label>
+
+            <select name="choices1" id="select1" onchange="onChange1()">
+              <option value="none">None</option>
+              <option value="immigration">Immigration</option>
+              <option value="testing">Testing</option>
+              <option value="baggage">Baggage</option>
+            </select>
+
+            <label for="select2">Station 2:</label>
+
+            <select name="choices2" id="select2" onchange="onChange2()">
+              <option value="none">None</option>
+              <option value="immigration">Immigration</option>
+              <option value="testing">Testing</option>
+              <option value="baggage">Baggage</option>
+            </select>
+
+            <label for="select3">Station 3:</label>
+
+            <select name="choices3" id="select3" onchange="onChange3()">
+              <option value="none">None</option>
+              <option value="immigration">Immigration</option>
+              <option value="testing">Testing</option>
+              <option value="baggage">Baggage</option>
+            </select>
+            <br />
+          </div>
+
+          <div class="parameters">
+            <p><strong>Station Parameters</strong></p>
+            <!-- <label for="arrivalRate">Arrival rate:</label>
+            <div class="slidecontainer">
+              <input type="range" min="1" max="100" value="50" class="slider" id="arrivalRate" onchange="updateTextInput(this.value)">
+              <output type="text" id="textInput" value="50">
+            </div> -->
+
+            <label for="immigrationNum">Number of immigration booths:</label>
+            <select
+              name="immigrationNum"
+              id="immigrationNum"
+              onchange="numImmigrationOfficersChange()"
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+
+            <label for="testingNum">Number of testing booths:</label>
+            <select
+              name="testingNum"
+              id="testingNum"
+              onchange="numTestingDoctorsChange()"
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+
+            <label for="queueNum">Number of baggage queue lanes:</label>
+            <select
+              name="queueNum"
+              id="queueNum"
+              onchange="numBaggageQueuesChange()"
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+
+          <div class="probabilities">
+            <p><strong>Agent Parameters</strong></p>
+            <label for="probArrival">Arrival rate:</label>
+            <input
+              type="text"
+              name="probArrival"
+              id="probArrival"
+              size="5"
+              value="0.5"
+              onchange="changeProb()"
+            />
+            <br />
+            <label for="probImmigration">Immigration rate:</label>
+            <input
+              type="text"
+              name="probImmigration"
+              id="probImmigration"
+              size="5"
+              value="0.5"
+              onchange="changeProb()"
+            />
+            <br />
+            <label for="probTesting">Testing rate:</label>
+            <input
+              type="text"
+              name="probTesting"
+              id="probTesting"
+              size="5"
+              value="0.5"
+              onchange="changeProb()"
+            />
+            <br />
+            <label for="probCOVID">COVID rate:</label>
+            <input
+              type="text"
+              name="probCOVID"
+              id="probCOVID"
+              size="5"
+              value="0.5"
+              onchange="changeProb()"
+            />
+            <br />
+            <label for="probBaggage">Baggage collection rate:</label>
+            <input
+              type="text"
+              name="probBaggage"
+              id="probBaggage"
+              size="5"
+              value="0.5"
+              onchange="changeProb()"
+            />
+            <br />
+            <label for="timeTest">COVID test time:</label>
+            <input
+              type="text"
+              name="timeTest"
+              id="timeTest"
+              size="5"
+              value="40"
+              onchange="changeProb()"
+            />
+            <!-- <br />
+            <label for="numPassengers"
+              >Number of passengers to be simulated:</label
+            >
+            <input
+              type="text"
+              name="numPassengers"
+              id="numPassengers"
+              size="5"
+              value="0"
+            />
+            <br />
+            <label for="timeSim">Simulation time:</label>
+            <input type="text" name="timeSim" id="timeSim" size="5" value="0" /> -->
+            <br />
+            <label for="animationDelay">Animation delay:</label>
+            <input
+              type="text"
+              name="animationDelay"
+              id="animationDelay"
+              size="5"
+              value="20"
+            />
+          </div>
         </div>
-
-        <div class="parameters">
-          <p>Parameters</p>
-          <!-- <label for="arrivalRate">Arrival rate:</label>
-          <div class="slidecontainer">
-            <input type="range" min="1" max="100" value="50" class="slider" id="arrivalRate" onchange="updateTextInput(this.value)">
-            <output type="text" id="textInput" value="50">
-          </div> -->
-          
-          <label for="immigrationNum">Number of immigration booths:</label>
-          <select name="immigrationNum" id="immigrationNum" onchange="numImmigrationOfficersChange()">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-          </select>
-
-          <label for="testingNum">Number of testing booths:</label>
-          <select name="testingNum" id="testingNum" onchange="numTestingDoctorsChange()">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-          </select>
-        </div>
-
       </div>
 
       <footer class="footer">
