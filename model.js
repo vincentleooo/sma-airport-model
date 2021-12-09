@@ -431,35 +431,41 @@ function updatePassenger(index) {
             } // Final state if nothing else will be "out".
           }
 
-          passenger.state = newState;
-          queueState = newState + "Queue"
-          passenger.queueState = queueState;
-
-          chosenQueue = 0;
-
-          for (let i in objects[queueState]) {
-            if (i !== "0") {
-              if (
-                Number(objects[queueState][i].stack) <
-                Number(objects[queueState][chosenQueue].stack)
-              ) {
-                chosenQueue = Number(i);
+          if (newState == "exiting") {
+            passenger.state = "exiting";
+            passenger.targetCol = width;
+            passenger.targetRow = height / 2;
+          } else {
+            passenger.state = newState;
+            queueState = newState + "Queue"
+            passenger.queueState = queueState;
+  
+            chosenQueue = 0;
+  
+            for (let i in objects[queueState]) {
+              if (i !== "0") {
+                if (
+                  Number(objects[queueState][i].stack) <
+                  Number(objects[queueState][chosenQueue].stack)
+                ) {
+                  chosenQueue = Number(i);
+                }
               }
             }
+  
+            let stackOverflow = 0;
+  
+            if (Number(objects[queueState][chosenQueue].stack) > 100) {
+              stackOverflow = Number(objects[queueState][chosenQueue].stack) - 100;
+            }
+  
+            passenger.targetRow = Number(objects[queueState][chosenQueue].row) + 3;
+            passenger.targetCol = Number(objects[queueState][chosenQueue].col) - stackOverflow;
+            passenger.station = station;
+            passenger.chosenQueue = chosenQueue;
+            let newStack = Number(objects[queueState][chosenQueue].stack) + 1;
+            objects[queueState][chosenQueue].stack = newStack;
           }
-
-          let stackOverflow = 0;
-
-          if (Number(objects[queueState][chosenQueue].stack) > 100) {
-            stackOverflow = Number(objects[queueState][chosenQueue].stack) - 100;
-          }
-
-          passenger.targetRow = Number(objects[queueState][chosenQueue].row) + 3;
-          passenger.targetCol = Number(objects[queueState][chosenQueue].col) - stackOverflow;
-          passenger.station = station;
-          passenger.chosenQueue = chosenQueue;
-          let newStack = Number(objects[queueState][chosenQueue].stack) + 1;
-          objects[queueState][chosenQueue].stack = newStack;
         }
       }
       console.log(state)
