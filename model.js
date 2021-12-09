@@ -437,13 +437,22 @@ function updatePassenger(index) {
             passenger.targetRow = height / 2;
           } else {
             passenger.state = newState;
-            queueState = newState + "Queue"
+            queueState = newState + "Queue";
             passenger.queueState = queueState;
-  
-            chosenQueue = 0;
-  
+
+            function chosenQueueRectifier(chosenQueue) {
+              if (chosenQueue >= objects[queueState].length) {
+                chosenQueue -= 1;
+                return chosenQueueRectifier(chosenQueue);
+              } else {
+                return chosenQueue;
+              }
+            }
+
+            chosenQueue = chosenQueueRectifier(chosenQueue);
+
             for (let i in objects[queueState]) {
-              if (i !== "0") {
+              if (i !== chosenQueue) {
                 if (
                   Number(objects[queueState][i].stack) <
                   Number(objects[queueState][chosenQueue].stack)
@@ -452,15 +461,18 @@ function updatePassenger(index) {
                 }
               }
             }
-  
+
             let stackOverflow = 0;
-  
+
             if (Number(objects[queueState][chosenQueue].stack) > 100) {
-              stackOverflow = Number(objects[queueState][chosenQueue].stack) - 100;
+              stackOverflow =
+                Number(objects[queueState][chosenQueue].stack) - 100;
             }
-  
-            passenger.targetRow = Number(objects[queueState][chosenQueue].row) + 3;
-            passenger.targetCol = Number(objects[queueState][chosenQueue].col) - stackOverflow;
+
+            passenger.targetRow =
+              Number(objects[queueState][chosenQueue].row) + 3;
+            passenger.targetCol =
+              Number(objects[queueState][chosenQueue].col) - stackOverflow;
             passenger.station = station;
             passenger.chosenQueue = chosenQueue;
             let newStack = Number(objects[queueState][chosenQueue].stack) + 1;
@@ -468,8 +480,8 @@ function updatePassenger(index) {
           }
         }
       }
-      console.log(state)
-      console.log(queueState)
+      console.log(state);
+      console.log(queueState);
       break;
     // case "testing":
     //   if ()
