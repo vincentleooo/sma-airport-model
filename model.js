@@ -15,6 +15,7 @@ var probImmigration = 0.2;
 var probTesting = 0.1;
 var testingTime = 20;
 var probCovid = 0.05;
+var probFindBaggage = 0.1;
 
 var positions = {
   arrivals: 0,
@@ -34,10 +35,13 @@ var objects = {
   testing: [],
   testingBox: [],
   testingQueue: [],
+  baggage: [],
+  baggageQueue: [],
 };
 
 var numImmigrationOfficers = 1;
 var numTestingDoctors = 1;
+var numBaggageQueues = 5;
 
 function updateTextInput(val) {
   document.getElementById("textInput").value = val;
@@ -209,6 +213,28 @@ function createTestingDoctors() {
   }
 }
 
+function createBaggageArea() {
+  if (positions.baggage > 0) {
+    let newRow = height * 0.2;
+    newRow = newRow.toFixed(0);
+    let newCol = (width * (positions.baggage - 1)) / (numStations + 1);
+    newCol = newCol.toFixed(0);
+    let newHeight = height * 0.6;
+    newHeight = newHeight.toFixed(0);
+
+    let newBaggage = {
+      row: newRow,
+      col: newCol,
+      height: newHeight,
+      width: 100,
+    };
+
+    objects.baggage.push(newBaggage);
+  } else {
+    objects.baggage = [];
+  }
+}
+
 function createImmigrationQueues() {
   if (positions.immigration > 0) {
     for (let i = 1; i <= numImmigrationOfficers; i++) {
@@ -256,6 +282,31 @@ function createTestingQueues() {
     }
   } else {
     objects.testingQueue = [];
+  }
+}
+
+function createBaggageAreaQueue() {
+  if (positions.baggage > 0) {
+    for (let i = 1; i <= numBaggageQueues; i++) {
+      let newRow = (height * i) / (numBaggageQueues + 1);
+      newRow = newRow.toFixed(0);
+
+      let newCol = (width * (positions.baggage - 1)) / (numStations + 1);
+      newCol -= 110;
+      newCol = newCol.toFixed(0);
+
+      let newBaggageAreaQueue = {
+        id: i,
+        row: newRow,
+        col: newCol,
+        state: IDLE,
+        stack: 0,
+      };
+
+      objects.baggageQueue.push(newBaggageAreaQueue);
+    }
+  } else {
+    objects.baggageQueue = [];
   }
 }
 
@@ -526,12 +577,9 @@ function updatePassenger(index) {
           objects.testing[chosenQueue].state == "IDLE"
         ) {
           passenger.queueState = "testBox";
-          passenger.targetRow =
-            Number(objects.testing[chosenQueue].row) + 3;
-          passenger.targetCol =
-            Number(objects.testing[chosenQueue].col) - 1;
-          let newStack =
-            Number(objects.testingQueue[chosenQueue].stack) - 1;
+          passenger.targetRow = Number(objects.testing[chosenQueue].row) + 3;
+          passenger.targetCol = Number(objects.testing[chosenQueue].col) - 1;
+          let newStack = Number(objects.testingQueue[chosenQueue].stack) - 1;
           objects.testingQueue[chosenQueue].stack = newStack;
           objects.testing[chosenQueue].state = "BUSY";
         } else if (col < Number(objects[queueState][chosenQueue].col) + 100) {
@@ -546,8 +594,7 @@ function updatePassenger(index) {
       } else if (queueState == "testBox" && hasArrived) {
         if (Math.random() < probTesting) {
           passenger.queueState = "enteringTestBox";
-          passenger.targetCol =
-            Number(objects.testingBox[0].col) - 1;
+          passenger.targetCol = Number(objects.testingBox[0].col) - 1;
           objects.testing[chosenQueue].state = "IDLE";
         }
       } else if (queueState == "enteringTestBox" && hasArrived) {
@@ -567,8 +614,8 @@ function updatePassenger(index) {
           newCol = boxCol + randCol;
 
           let overlappedList = objects.passengers.filter(function (d) {
-            return (d.targetRow == newRow) && (d.targetCol == newCol)
-          })
+            return d.targetRow == newRow && d.targetCol == newCol;
+          });
 
           if (overlappedList.length == 0) {
             overlapping = false;
@@ -576,17 +623,17 @@ function updatePassenger(index) {
 
           // ! DEFINE BEHAVIOUR WHEN BOX IS FULL (UNLIKELY, BUT STILL).
           // * FOR NOW, IF BOX IS FULL, ALLOW OVERLAP.
-          if (count > (boxWidth * boxHeight)) {
+          if (count > boxWidth * boxHeight) {
             overlapping = false;
           }
         }
 
         passenger.targetCol = newCol;
         passenger.targetRow = newRow;
-        passenger.queueState = "waiting"
+        passenger.queueState = "waiting";
       } else if (queueState == "waiting" && hasArrived) {
         passenger.timeWaited = Number(passenger.timeWaited) + 1;
-        if ((passenger.timeWaited >= testingTime) && passenger.covid) {
+        if (passenger.timeWaited >= testingTime && passenger.covid) {
           passenger.state = "covid";
           passenger.targetRow = 0;
         } else if (passenger.timeWaited >= testingTime) {
@@ -653,6 +700,127 @@ function updatePassenger(index) {
         }
       }
       break;
+    case "baggage":
+      if (queueState == "baggageQueue" && hasArrived) {
+        if (
+          col == Number(objects[queueState][chosenQueue].col) + 100
+        ) {
+          passenger.queueState = "gettingBaggage";
+          passenger.targetCol = Number(objects.baggage[chosenQueue].col) - 1;
+          let newStack = Number(objects.baggageQueue[chosenQueue].stack) - 1;
+          objects.baggageQueue[chosenQueue].stack = newStack;
+          // objects.testing[chosenQueue].state = "BUSY";
+        } else if (col < Number(objects[queueState][chosenQueue].col) + 100) {
+          let filledCol = objects.passengers.filter(function (i) {
+            return i.col == col + 1 && i.row == row;
+          });
+
+          if (filledCol.length == 0) {
+            passenger.targetCol = col + 1;
+          }
+        }
+      } else if (queueState == "gettingBaggage" && hasArrived) {
+        let boxWidth = Number(objects.baggage[0].width);
+        let boxHeight = Number(objects.baggage[0].height);
+        let boxRow = Number(objects.baggage[0].row);
+        let boxCol = Number(objects.baggage[0].col);
+        let newCol;
+        let newRow;
+
+        let overlapping = true;
+        while (overlapping) {
+          let count = 1;
+          let randRow = Math.floor(Math.random() * boxHeight);
+          let randCol = Math.floor(Math.random() * boxWidth);
+          newRow = boxRow + randRow;
+          newCol = boxCol + randCol;
+
+          let overlappedList = objects.passengers.filter(function (d) {
+            return d.targetRow == newRow && d.targetCol == newCol;
+          });
+
+          if (overlappedList.length == 0) {
+            overlapping = false;
+          }
+
+          // ! DEFINE BEHAVIOUR WHEN BOX IS FULL (UNLIKELY, BUT STILL).
+          // * FOR NOW, IF BOX IS FULL, ALLOW OVERLAP.
+          if (count > boxWidth * boxHeight) {
+            overlapping = false;
+          }
+        }
+
+        passenger.targetCol = newCol;
+        passenger.targetRow = newRow;
+        passenger.queueState = "reachedBaggage";
+      } else if (queueState == "reachedBaggage" && hasArrived) {
+        if (Math.random() < probFindBaggage) {
+          let station = Number(passenger.station);
+          station += 1;
+          let newState = getKeyByValue(positions, station);
+          if (newState == undefined) {
+            newState = getKeyByValue(positions, station + 1);
+            station += 1;
+            if (newState == undefined) {
+              newState = getKeyByValue(positions, station + 1);
+              station += 1;
+            } // Final state if nothing else will be "out".
+          }
+
+          if (newState == "exiting") {
+            passenger.state = "exiting";
+            passenger.targetCol = width;
+            passenger.targetRow = height / 2;
+          } else {
+            passenger.state = newState;
+            queueState = newState + "Queue";
+            passenger.queueState = queueState;
+
+            function chosenQueueRectifier(chosenQueue) {
+              //* Recursive function when having mismatched station lengths.
+              if (chosenQueue >= objects[queueState].length) {
+                chosenQueue -= 1;
+                return chosenQueueRectifier(chosenQueue);
+              } else {
+                return chosenQueue;
+              }
+            }
+
+            chosenQueue = chosenQueueRectifier(chosenQueue);
+
+            for (let i in objects[queueState]) {
+              if (i !== chosenQueue) {
+                if (
+                  Number(objects[queueState][i].stack) <
+                  Number(objects[queueState][chosenQueue].stack)
+                ) {
+                  chosenQueue = Number(i);
+                }
+              }
+            }
+
+            let stackOverflow = 0;
+
+            if (Number(objects[queueState][chosenQueue].stack) > 100) {
+              stackOverflow =
+                Number(objects[queueState][chosenQueue].stack) - 100;
+            }
+
+            passenger.targetRow =
+              Number(objects[queueState][chosenQueue].row) + 3;
+            passenger.targetCol =
+              Number(objects[queueState][chosenQueue].col) - stackOverflow;
+            passenger.station = station;
+            passenger.chosenQueue = chosenQueue;
+            let newStack = Number(objects[queueState][chosenQueue].stack) + 1;
+            objects[queueState][chosenQueue].stack = newStack;
+          }
+        } else {
+          passenger.queueState = "gettingBaggage";
+          hasArrived = true;
+        }
+      }
+      break;
     case "exiting":
       if (hasArrived) {
         passenger.state = "out";
@@ -660,9 +828,9 @@ function updatePassenger(index) {
       break;
     case "covid":
       if (hasArrived) {
-        console.log(passenger)
+        console.log(passenger);
         passenger.state = "exiting";
-        console.log(passenger.state)
+        console.log(passenger.state);
       }
   }
 
@@ -700,11 +868,15 @@ function redrawWindow() {
   objects.testing = [];
   objects.testingBox = [];
   objects.testingQueue = [];
+  objects.baggage = [];
+  objects.baggageQueue = [];
   createImmigrationOfficers();
   createImmigrationQueues();
   createTestingDoctors();
   createTestingBox();
   createTestingQueues();
+  createBaggageArea();
+  createBaggageAreaQueue();
 
   var allImmigrationOfficers = surface
     .selectAll(".immigration")
@@ -724,10 +896,20 @@ function redrawWindow() {
     .selectAll(".testingQueue")
     .data(objects.testingQueue);
 
+  var allBaggageAreas = surface
+    .selectAll(".baggageArea")
+    .data(objects.baggage);
+
+  var allBaggageAreaQueues = surface
+    .selectAll(".baggageAreaQueue")
+    .data(objects.baggageQueue);
+
   allImmigrationOfficers.exit().remove();
   allImmigrationQueues.exit().remove();
   allTestingDoctors.exit().remove();
   allTestingBoxes.exit().remove();
+  allBaggageAreas.exit().remove();
+  allBaggageAreaQueues.exit().remove();
 
   var newImmigrationOfficers = allImmigrationOfficers
     .enter()
@@ -753,6 +935,16 @@ function redrawWindow() {
     .enter()
     .append("g")
     .attr("class", "testingQueue");
+
+  var newBaggageAreas = allBaggageAreas
+    .enter()
+    .append("g")
+    .attr("class", "baggageArea");
+
+  var newBaggageAreaQueues = allBaggageAreaQueues
+    .enter()
+    .append("g")
+    .attr("class", "baggageAreaQueue");
 
   newImmigrationOfficers
     .append("svg")
@@ -833,7 +1025,7 @@ function redrawWindow() {
     })
     .attr("fill", "transparent")
     .attr("stroke", "palevioletred");
-  
+
   newTestingBoxes
     .append("text")
     .attr("x", function (d) {
@@ -858,6 +1050,49 @@ function redrawWindow() {
     .attr("width", "100px")
     .attr("fill", "transparent")
     .attr("stroke", "palevioletred");
+
+  newBaggageAreas
+    .append("svg")
+    .append("rect")
+    .attr("x", function (d) {
+      return d.col + "px";
+    })
+    .attr("y", function (d) {
+      return d.row + "px";
+    })
+    .attr("height", function (d) {
+      return d.height + "px";
+    })
+    .attr("width", function (d) {
+      return d.width + "px";
+    })
+    .attr("fill", "transparent")
+    .attr("stroke", "#4863A0");
+
+  newBaggageAreas
+    .append("text")
+    .attr("x", function (d) {
+      return Number(d.col) + "px";
+    })
+    .attr("y", function (d) {
+      return Number(d.row) + 10 + Number(d.height) + "px";
+    })
+    .attr("dy", ".35em")
+    .text("Baggage Collection");
+
+  newBaggageAreaQueues
+    .append("svg")
+    .append("rect")
+    .attr("x", function (d) {
+      return d.col + "px";
+    })
+    .attr("y", function (d) {
+      return d.row + "px";
+    })
+    .attr("height", "8px")
+    .attr("width", "100px")
+    .attr("fill", "transparent")
+    .attr("stroke", "#4863A0");
 
   surface.style("font-size", "x-small");
 
