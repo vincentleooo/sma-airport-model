@@ -14,6 +14,7 @@ var probArrival = 0.3;
 var probImmigration = 0.2;
 var probTesting = 0.1;
 var testingTime = 20;
+var probCovid = 0.05;
 
 var positions = {
   arrivals: 0,
@@ -316,6 +317,12 @@ function addDynamicAgents() {
       stackOverflow = Number(objects[queueState][chosenQueue].stack) - 100;
     }
 
+    let covid = false;
+
+    if (Math.random() < probCovid) {
+      covid = true;
+    }
+
     let newPassenger = {
       id: 1,
       row: height / 2,
@@ -327,6 +334,7 @@ function addDynamicAgents() {
       targetCol: Number(objects[queueState][chosenQueue].col) - stackOverflow,
       station: station,
       timeWaited: 0,
+      covid: covid,
     };
     objects.passengers.push(newPassenger);
     let newStack = Number(objects[queueState][chosenQueue].stack) + 1;
@@ -354,8 +362,20 @@ function updateSurface() {
     })
     .attr("height", "2px")
     .attr("width", "2px")
-    .attr("fill", "yellow")
-    .attr("stroke", "black");
+    .attr("fill", function (d) {
+      if (d.state == "covid") {
+        return "red";
+      } else {
+        return "black";
+      }
+    })
+    .attr("stroke", function (d) {
+      if (d.state == "covid") {
+        return "red";
+      } else {
+        return "black";
+      }
+    });
 
   let passengers = allPassengers.selectAll("rect");
 
@@ -366,6 +386,20 @@ function updateSurface() {
     })
     .attr("y", function (d) {
       return d.row + "px";
+    })
+    .attr("fill", function (d) {
+      if (d.state == "covid") {
+        return "red";
+      } else {
+        return "black";
+      }
+    })
+    .attr("stroke", function (d) {
+      if (d.state == "covid") {
+        return "red";
+      } else {
+        return "black";
+      }
     })
     .duration(animationDelay)
     .ease(d3.easeLinear());
@@ -484,8 +518,6 @@ function updatePassenger(index) {
           }
         }
       }
-      console.log(state);
-      console.log(queueState);
       break;
     case "testing":
       if (queueState == "testingQueue" && hasArrived) {
@@ -554,7 +586,10 @@ function updatePassenger(index) {
         passenger.queueState = "waiting"
       } else if (queueState == "waiting" && hasArrived) {
         passenger.timeWaited = Number(passenger.timeWaited) + 1;
-        if (passenger.timeWaited >= testingTime) {
+        if ((passenger.timeWaited >= testingTime) && passenger.covid) {
+          passenger.state = "covid";
+          passenger.targetRow = 0;
+        } else if (passenger.timeWaited >= testingTime) {
           let station = Number(passenger.station);
           station += 1;
           let newState = getKeyByValue(positions, station);
@@ -623,6 +658,12 @@ function updatePassenger(index) {
         passenger.state = "out";
       }
       break;
+    case "covid":
+      if (hasArrived) {
+        console.log(passenger)
+        passenger.state = "exiting";
+        console.log(passenger.state)
+      }
   }
 
   let targetRow = Number(passenger.targetRow);
@@ -824,7 +865,7 @@ function redrawWindow() {
 }
 
 function removeDynamicAgents() {
-  let allPassengers = surface.selectAll(".passenger").data(object.passengers);
+  let allPassengers = surface.selectAll(".passenger").data(objects.passengers);
   let exitingPassengers = allPassengers.filter(function (d) {
     return d.state == "out";
   });
@@ -837,9 +878,9 @@ function removeDynamicAgents() {
 function simStep() {
   if (isRunning) {
     currentTime += 1;
+    removeDynamicAgents();
     addDynamicAgents();
     updateDynamicAgents();
-    removeDynamicAgents();
   }
 }
 
