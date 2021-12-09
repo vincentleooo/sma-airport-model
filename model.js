@@ -365,7 +365,7 @@ function updateSurface() {
       return d.row + "px";
     })
     .duration(animationDelay)
-    .ease("linear");
+    .ease(d3.easeLinear());
 }
 
 function updateDynamicAgents() {
@@ -418,6 +418,7 @@ function updatePassenger(index) {
         if (Math.random() < probImmigration) {
           // TODO Create function callable by the different states.
           // ? Could probably do a recursive function for this.
+          objects.immigration[chosenQueue].state = "IDLE";
           let station = Number(passenger.station);
           station += 1;
           let newState = getKeyByValue(positions, station);
@@ -434,7 +435,7 @@ function updatePassenger(index) {
           queueState = newState + "Queue"
           passenger.queueState = queueState;
 
-          let chosenQueue = 0;
+          chosenQueue = 0;
 
           for (let i in objects[queueState]) {
             if (i !== "0") {
@@ -459,11 +460,10 @@ function updatePassenger(index) {
           passenger.chosenQueue = chosenQueue;
           let newStack = Number(objects[queueState][chosenQueue].stack) + 1;
           objects[queueState][chosenQueue].stack = newStack;
-          objects.immigration[chosenQueue].state = "IDLE";
-        } else {
-          objects.immigration[chosenQueue].state = "BUSY";
         }
       }
+      console.log(state)
+      console.log(queueState)
       break;
     // case "testing":
     //   if ()
