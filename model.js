@@ -1,3 +1,9 @@
+/*
+? In this code you will see the variables and object keys referring to stacks.
+! Know that they are not technically stacks but instead queues (FIFO).
+* I wanted to make the Stack Overflow joke.
+*/
+
 var currentTime = 0;
 var animationDelay = 20;
 var cellsPerStep = 1;
@@ -5,9 +11,10 @@ const IDLE = 0;
 const BUSY = 1;
 const ICAOFFICER = 0;
 var isRunning = false;
+var isPaused = false;
 var surface;
 
-const width = 1280;
+const width = 960;
 const height = 540;
 
 var probArrival = 0.5;
@@ -16,20 +23,32 @@ var probTesting = 0.5;
 var testingTime = 40;
 var probCovid = 0.5;
 var probFindBaggage = 0.5;
+var randomChosenQueue = 0.3;
+var exitedPassengers = 0;
+var passengerCount = 150;
+var enteredPassengers = 0;
+var simulationRuns = 1;
+var simulationsRan = 0;
+var listTimeToClear = [];
+var listMeanTimeToClear = [];
+var listSimulationRunTime = [];
 
 function changeProb() {
-  if (isRunning) {
+  if (isRunning || isPaused) {
     alert(
-      "Please stop the model first before changing this parameter. Changing the parameter will reset the simulation."
+      "Please reset the model first before changing this parameter. Changing the parameter will reset the simulation."
     );
   } else {
-    probArrival = Number(document.getElementById("probArrival").value);
-    probImmigration = Number(document.getElementById("probImmigration").value);
-    probTesting = Number(document.getElementById("probTesting").value);
+    probArrival = 1 / Number(document.getElementById("probArrival").value);
+    probImmigration =
+      1 / Number(document.getElementById("probImmigration").value);
+    probTesting = 1 / Number(document.getElementById("probTesting").value);
     probCovid = Number(document.getElementById("probCOVID").value);
     testingTime = Number(document.getElementById("timeTest").value);
     probFindBaggage = Number(document.getElementById("probBaggage").value);
     animationDelay = Number(document.getElementById("animationDelay").value);
+    passengerCount = Number(document.getElementById("passengerCount").value);
+    simulationRuns = Number(document.getElementById("simulationRuns").value);
   }
 }
 
@@ -68,9 +87,9 @@ function getKeyByValue(object, value) {
 }
 
 function numImmigrationOfficersChange() {
-  if (isRunning) {
+  if (isRunning || isPaused) {
     alert(
-      "Please stop the model first before changing this parameter. Changing the parameter will reset the simulation."
+      "Please reset the model first before changing this parameter. Changing the parameter will reset the simulation."
     );
     let select = document.querySelector("#immigrationNum");
     select.value = String(numImmigrationOfficers);
@@ -83,9 +102,9 @@ function numImmigrationOfficersChange() {
 }
 
 function numTestingDoctorsChange() {
-  if (isRunning) {
+  if (isRunning || isPaused) {
     alert(
-      "Please stop the model first before changing this parameter. Changing the parameter will reset the simulation."
+      "Please reset the model first before changing this parameter. Changing the parameter will reset the simulation."
     );
     let select = document.querySelector("#testingNum");
     select.value = String(numTestingDoctors);
@@ -98,9 +117,9 @@ function numTestingDoctorsChange() {
 }
 
 function numBaggageQueuesChange() {
-  if (isRunning) {
+  if (isRunning || isPaused) {
     alert(
-      "Please stop the model first before changing this parameter. Changing the parameter will reset the simulation."
+      "Please reset the model first before changing this parameter. Changing the parameter will reset the simulation."
     );
     let select = document.querySelector("#queueNum");
     select.value = String(numBaggageQueues);
@@ -111,9 +130,9 @@ function numBaggageQueuesChange() {
 }
 
 function onChange1() {
-  if (isRunning) {
+  if (isRunning || isPaused) {
     alert(
-      "Please stop the model first before changing this parameter. Changing the parameter will reset the simulation."
+      "Please reset the model first before changing this parameter. Changing the parameter will reset the simulation."
     );
   } else {
     var choice1 = document.getElementsByName("choices1")[0].value;
@@ -138,7 +157,7 @@ function onChange1() {
 }
 
 function onChange2() {
-  if (isRunning) {
+  if (isRunning || isPaused) {
     alert(
       "Please stop the model first before changing this parameter. Changing the parameter will reset the simulation."
     );
@@ -165,7 +184,7 @@ function onChange2() {
 }
 
 function onChange3() {
-  if (isRunning) {
+  if (isRunning || isPaused) {
     alert(
       "Please stop the model first before changing this parameter. Changing the parameter will reset the simulation."
     );
@@ -241,18 +260,18 @@ function createTestingDoctors() {
 
 function createBaggageArea() {
   if (positions.baggage > 0) {
-    let newRow = height * 0.2;
+    let newRow = height * 0.35;
     newRow = newRow.toFixed(0);
-    let newCol = (width * (positions.baggage - 1)) / (numStations + 1);
+    let newCol = (width * (positions.baggage - 1)) / (numStations + 1) + 25;
     newCol = newCol.toFixed(0);
-    let newHeight = height * 0.6;
+    let newHeight = height * 0.3;
     newHeight = newHeight.toFixed(0);
 
     let newBaggage = {
       row: newRow,
       col: newCol,
       height: newHeight,
-      width: 100,
+      width: 50,
     };
 
     objects.baggage.push(newBaggage);
@@ -268,7 +287,7 @@ function createImmigrationQueues() {
       newRow = newRow.toFixed(0);
 
       let newCol = (width * (positions.immigration - 1)) / (numStations + 1);
-      newCol -= 110;
+      newCol -= 60;
       newCol = newCol.toFixed(0);
 
       let newImmigrationQueue = {
@@ -293,7 +312,7 @@ function createTestingQueues() {
       newRow = newRow.toFixed(0);
 
       let newCol = (width * (positions.testing - 1)) / (numStations + 1);
-      newCol -= 110;
+      newCol -= 60;
       newCol = newCol.toFixed(0);
 
       let newTestingQueue = {
@@ -318,7 +337,7 @@ function createBaggageAreaQueue() {
       newRow = newRow.toFixed(0);
 
       let newCol = (width * (positions.baggage - 1)) / (numStations + 1);
-      newCol -= 110;
+      newCol -= 35;
       newCol = newCol.toFixed(0);
 
       let newBaggageAreaQueue = {
@@ -353,7 +372,7 @@ function createTestingBox() {
       row: newRow,
       col: newCol,
       height: newHeight,
-      width: 75,
+      width: 50,
       stack: 0,
     };
 
@@ -390,8 +409,8 @@ function addDynamicAgents() {
 
     let stackOverflow = 0;
 
-    if (Number(objects[queueState][chosenQueue].stack) > 100) {
-      stackOverflow = Number(objects[queueState][chosenQueue].stack) - 100;
+    if (Number(objects[queueState][chosenQueue].stack) > 50) {
+      stackOverflow = Number(objects[queueState][chosenQueue].stack) - 50;
     }
 
     let covid = false;
@@ -412,10 +431,12 @@ function addDynamicAgents() {
       station: station,
       timeWaited: 0,
       covid: covid,
+      timeTaken: 0,
     };
     objects.passengers.push(newPassenger);
     let newStack = Number(objects[queueState][chosenQueue].stack) + 1;
     objects[queueState][chosenQueue].stack = newStack;
+    enteredPassengers += 1;
   }
 }
 
@@ -438,7 +459,7 @@ function updateSurface() {
       return d.row + "px";
     })
     .attr("height", "2px")
-    .attr("width", "2px")
+    .attr("width", "1px")
     .attr("fill", function (d) {
       if (d.state == "covid") {
         return "red";
@@ -448,9 +469,9 @@ function updateSurface() {
     })
     .attr("stroke", function (d) {
       if (d.state == "covid") {
-        return "red";
+        return "purple";
       } else {
-        return "black";
+        return "green";
       }
     });
 
@@ -479,7 +500,7 @@ function updateSurface() {
       }
     })
     .duration(animationDelay)
-    .ease(d3.easeLinear());
+    .ease(d3.easeLinear);
 }
 
 function updateDynamicAgents() {
@@ -507,7 +528,7 @@ function updatePassenger(index) {
     case "immigration":
       if (queueState == "immigrationQueue" && hasArrived) {
         if (
-          col == Number(objects[queueState][chosenQueue].col) + 100 &&
+          col == Number(objects[queueState][chosenQueue].col) + 50 &&
           objects.immigration[chosenQueue].state == "IDLE"
         ) {
           passenger.queueState = "none";
@@ -519,7 +540,7 @@ function updatePassenger(index) {
             Number(objects.immigrationQueue[chosenQueue].stack) - 1;
           objects.immigrationQueue[chosenQueue].stack = newStack;
           objects.immigration[chosenQueue].state = "BUSY";
-        } else if (col < Number(objects[queueState][chosenQueue].col) + 100) {
+        } else if (col < Number(objects[queueState][chosenQueue].col) + 50) {
           let filledCol = objects.passengers.filter(function (i) {
             return i.col == col + 1 && i.row == row;
           });
@@ -577,11 +598,17 @@ function updatePassenger(index) {
               }
             }
 
+            if (Math.random() < randomChosenQueue) {
+              chosenQueue = Math.floor(
+                Math.random() * objects[queueState].length
+              );
+            }
+
             let stackOverflow = 0;
 
-            if (Number(objects[queueState][chosenQueue].stack) > 100) {
+            if (Number(objects[queueState][chosenQueue].stack) > 50) {
               stackOverflow =
-                Number(objects[queueState][chosenQueue].stack) - 100;
+                Number(objects[queueState][chosenQueue].stack) - 50;
             }
 
             passenger.targetRow =
@@ -599,7 +626,7 @@ function updatePassenger(index) {
     case "testing":
       if (queueState == "testingQueue" && hasArrived) {
         if (
-          col == Number(objects[queueState][chosenQueue].col) + 100 &&
+          col == Number(objects[queueState][chosenQueue].col) + 50 &&
           objects.testing[chosenQueue].state == "IDLE"
         ) {
           passenger.queueState = "testBox";
@@ -608,7 +635,7 @@ function updatePassenger(index) {
           let newStack = Number(objects.testingQueue[chosenQueue].stack) - 1;
           objects.testingQueue[chosenQueue].stack = newStack;
           objects.testing[chosenQueue].state = "BUSY";
-        } else if (col < Number(objects[queueState][chosenQueue].col) + 100) {
+        } else if (col < Number(objects[queueState][chosenQueue].col) + 50) {
           let filledCol = objects.passengers.filter(function (i) {
             return i.col == col + 1 && i.row == row;
           });
@@ -707,11 +734,17 @@ function updatePassenger(index) {
               }
             }
 
+            if (Math.random() < randomChosenQueue) {
+              chosenQueue = Math.floor(
+                Math.random() * objects[queueState].length
+              );
+            }
+
             let stackOverflow = 0;
 
-            if (Number(objects[queueState][chosenQueue].stack) > 100) {
+            if (Number(objects[queueState][chosenQueue].stack) > 50) {
               stackOverflow =
-                Number(objects[queueState][chosenQueue].stack) - 100;
+                Number(objects[queueState][chosenQueue].stack) - 50;
             }
 
             passenger.targetRow =
@@ -728,13 +761,13 @@ function updatePassenger(index) {
       break;
     case "baggage":
       if (queueState == "baggageQueue" && hasArrived) {
-        if (col == Number(objects[queueState][chosenQueue].col) + 100) {
+        if (col == Number(objects[queueState][chosenQueue].col) + 50) {
           let newStack = Number(objects.baggageQueue[chosenQueue].stack) - 1;
           objects.baggageQueue[chosenQueue].stack = newStack;
           passenger.queueState = "gettingBaggage";
           passenger.targetCol = Number(objects.baggage[0].col) - 1;
           // objects.testing[chosenQueue].state = "BUSY";
-        } else if (col < Number(objects[queueState][chosenQueue].col) + 100) {
+        } else if (col < Number(objects[queueState][chosenQueue].col) + 50) {
           let filledCol = objects.passengers.filter(function (i) {
             return i.col == col + 1 && i.row == row;
           });
@@ -823,11 +856,17 @@ function updatePassenger(index) {
               }
             }
 
+            if (Math.random() < randomChosenQueue) {
+              chosenQueue = Math.floor(
+                Math.random() * objects[queueState].length
+              );
+            }
+
             let stackOverflow = 0;
 
-            if (Number(objects[queueState][chosenQueue].stack) > 100) {
+            if (Number(objects[queueState][chosenQueue].stack) > 50) {
               stackOverflow =
-                Number(objects[queueState][chosenQueue].stack) - 100;
+                Number(objects[queueState][chosenQueue].stack) - 50;
             }
 
             passenger.targetRow =
@@ -848,6 +887,24 @@ function updatePassenger(index) {
     case "exiting":
       if (hasArrived) {
         passenger.state = "out";
+        exitedPassengers += 1;
+        document.getElementById("numExited").innerHTML =
+          "Number of exited passengers: " + exitedPassengers + ".";
+        listTimeToClear.push(Number(passenger.timeTaken));
+        newAvg =
+          listTimeToClear.reduce((a, b) => a + b) / listTimeToClear.length;
+        listMeanTimeToClear.push(newAvg);
+        if (isRunning == true) {
+          Plotly.extendTraces("tester", { y: [[getData1()]] }, [0]);
+          cnt++;
+          if (cnt > limit) {
+            Plotly.relayout("tester", {
+              xaxis: {
+                range: [cnt - limit, cnt],
+              },
+            });
+          }
+        }
       }
       break;
     case "covid":
@@ -855,6 +912,8 @@ function updatePassenger(index) {
         passenger.state = "exiting";
       }
   }
+
+  passenger.timeTaken = Number(passenger.timeTaken) + 1;
 
   let targetRow = Number(passenger.targetRow);
   let targetCol = Number(passenger.targetCol);
@@ -878,8 +937,21 @@ function redrawWindow() {
    * TODO Draw all the specified stations.
    */
   currentTime = 0;
+  exitedPassengers = 0;
+  enteredPassengers = 0;
+  listTimeToClear = [];
+  listMeanTimeToClear = [];
   document.getElementById("time").innerHTML =
-    "Current time is " + currentTime + ".";
+    "Current time is " +
+    currentTime +
+    " seconds or " +
+    (currentTime / 60).toFixed(2) +
+    " minutes or " +
+    (currentTime / 3600).toFixed(2) +
+    " hours.";
+  document.getElementById("numExited").innerHTML =
+    "Number of exited passengers: " + exitedPassengers + ".";
+  isPaused = false;
   isRunning = false;
   changeProb();
   var drawSurface = document.getElementById("surface");
@@ -1003,7 +1075,7 @@ function redrawWindow() {
       return d.row + "px";
     })
     .attr("height", "8px")
-    .attr("width", "100px")
+    .attr("width", "50px")
     .attr("fill", "transparent")
     .attr("stroke", "rebeccapurple");
 
@@ -1070,7 +1142,7 @@ function redrawWindow() {
       return d.row + "px";
     })
     .attr("height", "8px")
-    .attr("width", "100px")
+    .attr("width", "50px")
     .attr("fill", "transparent")
     .attr("stroke", "palevioletred");
 
@@ -1113,11 +1185,26 @@ function redrawWindow() {
       return d.row + "px";
     })
     .attr("height", "8px")
-    .attr("width", "100px")
+    .attr("width", "50px")
     .attr("fill", "transparent")
     .attr("stroke", "#4863A0");
 
   surface.style("font-size", "x-small");
+
+  Plotly.newPlot(
+    "tester",
+    [
+      {
+        y: [getData1()],
+        mode: "lines",
+        line: {
+          color: "rebeccapurple",
+          width: 1,
+        },
+      },
+    ],
+    layout1
+  )
 
   updateSurface();
 }
@@ -1137,18 +1224,71 @@ function simStep() {
   if (isRunning) {
     currentTime += 1;
     document.getElementById("time").innerHTML =
-      "Current time is " + currentTime + ".";
-    removeDynamicAgents();
-    addDynamicAgents();
-    updateDynamicAgents();
+      "Current time is " +
+      currentTime +
+      " seconds or " +
+      (currentTime / 60).toFixed(2) +
+      " minutes or " +
+      (currentTime / 3600).toFixed(2) +
+      " hours.";
+
+    if (enteredPassengers < passengerCount) {
+      removeDynamicAgents();
+      addDynamicAgents();
+      updateDynamicAgents();
+    } else if (exitedPassengers < passengerCount) {
+      removeDynamicAgents();
+      updateDynamicAgents();
+    } else {
+      isRunning = false;
+      isPaused = false;
+      clearInterval(simTimer);
+      simulationsRan += 1;
+      listSimulationRunTime.push(currentTime);
+      if (simulationsRan <= simulationRuns) {
+        redrawWindow();
+        isRunning = true;
+        simTimer = window.setInterval(simStep, animationDelay);
+        if (isRunning == true) {
+          Plotly.extendTraces("simulations", { y: [[getData2()]] }, [0]);
+          cnt++;
+          if (cnt > limit) {
+            Plotly.relayout("simulations", {
+              xaxis: {
+                range: [cnt - limit, cnt],
+              },
+            });
+          }
+        }
+      }
+    }
   }
+}
+
+function clearSimulationsRunTime() {
+  simulationsRan = 0;
+  listSimulationRunTime = [];
+  Plotly.newPlot(
+    "simulations",
+    [
+      {
+        y: [getData2()],
+        mode: "lines",
+        line: {
+          color: "palevioletred",
+          width: 1,
+        },
+      },
+    ],
+    layout1
+  );
 }
 
 function runSim() {
   let choice1 = document.getElementsByName("choices1")[0].value;
   let choice2 = document.getElementsByName("choices2")[0].value;
   let choice3 = document.getElementsByName("choices3")[0].value;
-
+  isPaused = false;
   changeProb();
 
   if (choice1 == "none" && choice2 == "none" && choice3 == "none") {
@@ -1162,9 +1302,11 @@ function runSim() {
     isNaN(probTesting) ||
     isNaN(probFindBaggage) ||
     isNaN(testingTime) ||
-    isNaN(animationDelay)
+    isNaN(animationDelay) ||
+    isNaN(passengerCount) ||
+    isNaN(simulationRuns)
   ) {
-    alert("At least one of the probabilities is not a number.");
+    alert("At least one of the inputs is not a number.");
   } else {
     isRunning = true;
     simTimer = window.setInterval(simStep, animationDelay);
@@ -1173,6 +1315,154 @@ function runSim() {
 
 function pause() {
   isRunning = false;
+  isPaused = true;
+  clearInterval(simTimer);
 }
+
+/*
+
+//set dimensions and margins of the graph
+var margin = {top:10, right:10, bottom:10, left:10},
+  widthg1 = 960 - margin.left - margin.right,
+  heightg1 = 540 - margin.top = margin.bottom;
+
+//append the svg object to the body of the page
+var svg = d3.select("graph1")
+   .append("svg")
+     .attr("width", widthg1)
+     .attr("height", heightg1)
+   .append("g")
+     .attr("transform",
+           "translate(" + margin.left + "," + margin.top + ")");
+
+var xScale = d3.scaleLinear().domain([0,50]).range([0,width1 - margin.left - margin.right])
+var yScale = d3.scaleLinear().domain([0, 5000]).range([height1 - margin.top - margin.bottom,0])
+
+var line = d3.line().curve(d3.curveMonotoneX)
+  .x(function(d){ return xScale(d.x); })
+  .y(function(d){ return yScale(d.y); })
+ 
+*/
+
+// set global variables
+const limit = 10000; // How many points can be on the graph before sliding occurs
+const refreshInterval = 100; // Time between refresh intervals
+
+// set functions to retrieve
+function getData1() {
+  if (listMeanTimeToClear.length > 0) {
+    return listMeanTimeToClear[listMeanTimeToClear.length - 1];
+  } else {
+    return 0;
+  }
+}
+
+function getData2() {
+  if (listSimulationRunTime.length > 0) {
+    return listSimulationRunTime[listSimulationRunTime.length - 1];
+  } else {
+    return 0;
+  }
+}
+// function getData2() {
+// 	return statistics[3].count;
+// 	}
+
+// set chart layout
+const layout1 = {
+  paper_bgcolor: "rgba(0,0,0,0)",
+  plot_bgcolor: "rgba(0,0,0,0)",
+  xaxis: { title: "Number of passengers", rangemode: "tozero"},
+  yaxis: { title: "Average time taken per passenger", rangemode: "tozero"},
+  font: {family: "Graphik"}
+};
+
+const layout2 = {
+  paper_bgcolor: "rgba(0,0,0,0)",
+  plot_bgcolor: "rgba(0,0,0,0)",
+  xaxis: { title: "Number of simulations", rangemode: "tozero"},
+  yaxis: { title: "Average time taken per simulation", rangemode: "tozero"},
+  font: {family: "Graphik"}
+};
+
+// const layout2 = {
+//   paper_bgcolor: 'rgba(0,0,0,0)',
+//   plot_bgcolor: 'rgba(0,0,0,0)',
+//   xaxis: {title: 'Time'},
+//   yaxis: {title: 'R0'}
+// };
+
+// plot all charts
+Plotly.newPlot(
+  "tester",
+  [
+    {
+      y: [getData1()],
+      mode: "lines",
+      line: {
+        color: "rebeccapurple",
+        width: 1,
+      },
+    },
+  ],
+  layout1
+);
+
+Plotly.newPlot(
+  "simulations",
+  [
+    {
+      y: [getData2()],
+      mode: "lines",
+      line: {
+        color: "palevioletred",
+        width: 1,
+      },
+    },
+  ],
+  layout2
+);
+
+// Plotly.plot('chart2',[{
+// 	y:[getData2()],
+// 	mode:'lines',
+// 	line: {
+// 		color: 'rgb(255,0,0)',
+// 		width: 3 }
+// }], layout2);
+
+// set refresh interval and graph limit
+var cnt = 0;
+// setInterval(function () {
+//   if (isRunning == true) {
+//     Plotly.extendTraces("tester", { y: [[getData1()]] }, [0]);
+//     cnt++;
+//     if (cnt > limit) {
+//       Plotly.relayout("tester", {
+//         xaxis: {
+//           range: [cnt - limit, cnt],
+//         },
+//       });
+//     }
+//   }
+// }, refreshInterval);
+
+/*
+function ClearPlot(){
+  Plotly.newPlot(
+  "simulationRuns",
+  [
+    {
+      y: [getData1()],
+      mode: "lines",
+      line: {
+        color: "rebeccapurple",
+        width: 1,
+      },
+    },
+  ],
+  layout1
+);
+}*/
 
 redrawWindow();

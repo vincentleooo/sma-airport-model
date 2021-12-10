@@ -102,12 +102,19 @@ label {
   font-size: small;
 }
 
-.selections select {
+.selections label {
   display: list-item;
+  list-style: none;
 }
 
-.parameters select {
+.parameters label {
   display: list-item;
+  list-style: none;
+}
+
+.probabilities label {
+  display: list-item;
+  list-style: none;
 }
 
 .slider {
@@ -145,10 +152,21 @@ label {
 
 .inputs {
   display: flex;
-  justify-content: flex-start;
-  gap: 12px;
+  justify-content: space-evenly;
 }
 
-#time {
+@media (max-width:800px) {
+  .inputs {
+    display: list-item;
+    list-style: none;
+  }
+}
+
+#time, #numExited {
   font-size: small;
+}
+
+#graphs {
+  display: flex;
+  gap: 5px;
 }

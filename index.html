@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.6.3.min.js"></script>
     <link rel="stylesheet" href="styles/stylesheet.css" />
     <title>SMA Project</title>
   </head>
@@ -35,54 +36,108 @@
         </p> -->
 
         <p id="time"></p>
+        <p id="numExited"></p>
 
         <div id="main" class="main">
           <svg
             id="surface"
-            style="width:100% height:100%"
+            xmlns="http://www.w3.org/2000/svg"
+            version="1.1"
+            viewBox="0 0 960 540"
+            preserveAspectRatio="xMidYMid meet"
+          ></svg>
+        </div>
+        <div id="graphs">
+          <div id="tester" style="width:100%; height:100%" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid meet"></div>
+          <div id="simulations" style="width:100%; height:100%" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid meet"></div>
+        </div>
+        
+        <!-- <div id="graphs">
+          <svg
+            id="graph1"
+            style="width: 50%; height: 100%; border: thin solid #333333"
             xmlns="http://www.w3.org/2000/svg"
             version="1.1"
             viewBox="0 0 1280 540"
             preserveAspectRatio="xMidYMid meet"
           ></svg>
-        </div>
+          <svg
+            id="graph2"
+            style="width: 50%; height: 100%; border: thin solid #333333"
+            xmlns="http://www.w3.org/2000/svg"
+            version="1.1"
+            viewBox="0 0 1280 540"
+            preserveAspectRatio="xMidYMid meet"
+          ></svg>
+        </div> -->
 
         <div class="simulate">
           <button class="button" onclick="runSim()">Start</button>
           <button class="button" onclick="pause()">Pause</button>
-          <button class="button" onclick="clearInterval(simTimer);redrawWindow();">Reset</button>
+          <button class="button" onclick="clearInterval(simTimer);clearSimulationsRunTime();redrawWindow();">Reset</button>
+          <!--
+            <button class="button" onclick="update(data1)">Agent</button>
+            <button class="button" onclick="update(data2")>Doctor</button>
+          -->
         </div>
 
         <div class="inputs">
           <div class="selections">
             <p><strong>Stations</strong></p>
-            <label for="select1">Station 1:</label>
+            <label for="select1"
+              >Station 1:
+              <select name="choices1" id="select1" onchange="onChange1()">
+                <option value="none">None</option>
+                <option value="immigration">Immigration</option>
+                <option value="testing">Testing</option>
+                <option value="baggage">Baggage</option>
+              </select></label
+            >
 
-            <select name="choices1" id="select1" onchange="onChange1()">
-              <option value="none">None</option>
-              <option value="immigration">Immigration</option>
-              <option value="testing">Testing</option>
-              <option value="baggage">Baggage</option>
-            </select>
+            <label for="select2"
+              >Station 2:
+              <select name="choices2" id="select2" onchange="onChange2()">
+                <option value="none">None</option>
+                <option value="immigration">Immigration</option>
+                <option value="testing">Testing</option>
+                <option value="baggage">Baggage</option>
+              </select></label
+            >
 
-            <label for="select2">Station 2:</label>
+            <label for="select3"
+              >Station 3:
+              <select name="choices3" id="select3" onchange="onChange3()">
+                <option value="none">None</option>
+                <option value="immigration">Immigration</option>
+                <option value="testing">Testing</option>
+                <option value="baggage">Baggage</option>
+              </select></label
+            >
 
-            <select name="choices2" id="select2" onchange="onChange2()">
-              <option value="none">None</option>
-              <option value="immigration">Immigration</option>
-              <option value="testing">Testing</option>
-              <option value="baggage">Baggage</option>
-            </select>
-
-            <label for="select3">Station 3:</label>
-
-            <select name="choices3" id="select3" onchange="onChange3()">
-              <option value="none">None</option>
-              <option value="immigration">Immigration</option>
-              <option value="testing">Testing</option>
-              <option value="baggage">Baggage</option>
-            </select>
             <br />
+
+            <label for="passengerCount"
+              >Passengers:
+              <input
+                type="text"
+                name="passengerCount"
+                id="passengerCount"
+                size="5"
+                value="150"
+                onchange="changeProb()"
+              />.</label
+            >
+            <label for="simulationRuns"
+              >Simulation runs:
+              <input
+                type="text"
+                name="simulationRuns"
+                id="simulationRuns"
+                size="5"
+                value="1"
+                onchange="changeProb()"
+              />.</label
+            >
           </div>
 
           <div class="parameters">
@@ -93,122 +148,143 @@
               <output type="text" id="textInput" value="50">
             </div> -->
 
-            <label for="immigrationNum">Number of immigration booths:</label>
-            <select
-              name="immigrationNum"
-              id="immigrationNum"
-              onchange="numImmigrationOfficersChange()"
+            <label for="immigrationNum"
+              >Immigration booths:
+              <select
+                name="immigrationNum"
+                id="immigrationNum"
+                onchange="numImmigrationOfficersChange()"
+              >
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select></label
             >
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-            </select>
 
-            <label for="testingNum">Number of testing booths:</label>
-            <select
-              name="testingNum"
-              id="testingNum"
-              onchange="numTestingDoctorsChange()"
+            <label for="testingNum"
+              >Testing booths:
+              <select
+                name="testingNum"
+                id="testingNum"
+                onchange="numTestingDoctorsChange()"
+              >
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select></label
             >
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-            </select>
 
-            <label for="queueNum">Number of baggage queue lanes:</label>
-            <select
-              name="queueNum"
-              id="queueNum"
-              onchange="numBaggageQueuesChange()"
+            <label for="queueNum"
+              >Baggage queue lanes:
+              <select
+                name="queueNum"
+                id="queueNum"
+                onchange="numBaggageQueuesChange()"
+              >
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select></label
             >
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-            </select>
           </div>
 
           <div class="probabilities">
             <p><strong>Agent Parameters</strong></p>
-            <label for="probArrival">Arrival rate:</label>
-            <input
-              type="text"
-              name="probArrival"
-              id="probArrival"
-              size="5"
-              value="0.5"
-              onchange="changeProb()"
-            />
-            <br />
-            <label for="probImmigration">Immigration rate:</label>
-            <input
-              type="text"
-              name="probImmigration"
-              id="probImmigration"
-              size="5"
-              value="0.5"
-              onchange="changeProb()"
-            />
-            <br />
-            <label for="probTesting">Testing rate:</label>
-            <input
-              type="text"
-              name="probTesting"
-              id="probTesting"
-              size="5"
-              value="0.5"
-              onchange="changeProb()"
-            />
-            <br />
-            <label for="probCOVID">COVID rate:</label>
-            <input
-              type="text"
-              name="probCOVID"
-              id="probCOVID"
-              size="5"
-              value="0.5"
-              onchange="changeProb()"
-            />
-            <br />
-            <label for="probBaggage">Baggage collection rate:</label>
-            <input
-              type="text"
-              name="probBaggage"
-              id="probBaggage"
-              size="5"
-              value="0.5"
-              onchange="changeProb()"
-            />
-            <br />
-            <label for="timeTest">COVID test time:</label>
-            <input
-              type="text"
-              name="timeTest"
-              id="timeTest"
-              size="5"
-              value="40"
-              onchange="changeProb()"
-            />
+            <label for="probArrival"
+              >Arrival rate:
+              <input
+                type="text"
+                name="probArrival"
+                id="probArrival"
+                size="5"
+                value="30"
+                onchange="changeProb()"
+              />
+              second(s).</label
+            >
+            <label for="probImmigration"
+              >Immigration rate:
+              <input
+                type="text"
+                name="probImmigration"
+                id="probImmigration"
+                size="5"
+                value="120"
+                onchange="changeProb()"
+              />
+              second(s).</label
+            >
+
+            <label for="probTesting"
+              >Testing rate:
+              <input
+                type="text"
+                name="probTesting"
+                id="probTesting"
+                size="5"
+                value="300"
+                onchange="changeProb()"
+              />
+              second(s).</label
+            >
+
+            <label for="probCOVID"
+              >COVID probability:
+              <input
+                type="text"
+                name="probCOVID"
+                id="probCOVID"
+                size="5"
+                value="0.05"
+                onchange="changeProb()"
+              />.</label
+            >
+
+            <label for="probBaggage"
+              >Baggage collection probability:
+              <input
+                type="text"
+                name="probBaggage"
+                id="probBaggage"
+                size="5"
+                value="0.5"
+                onchange="changeProb()"
+              />.</label
+            >
+            <label for="timeTest"
+              >COVID test time:
+              <input
+                type="text"
+                name="timeTest"
+                id="timeTest"
+                size="5"
+                value="900"
+                onchange="changeProb()"
+              />
+              seconds.</label
+            >
+
             <!-- <br />
             <label for="numPassengers"
               >Number of passengers to be simulated:</label
@@ -223,15 +299,18 @@
             <br />
             <label for="timeSim">Simulation time:</label>
             <input type="text" name="timeSim" id="timeSim" size="5" value="0" /> -->
-            <br />
-            <label for="animationDelay">Animation delay:</label>
-            <input
-              type="text"
-              name="animationDelay"
-              id="animationDelay"
-              size="5"
-              value="20"
-            />
+            <label for="animationDelay"
+              >Animation delay:
+              <input
+                type="text"
+                name="animationDelay"
+                id="animationDelay"
+                size="5"
+                value="10"
+                onclick="changeProb()"
+              />
+              milisecond(s).</label
+            >
           </div>
         </div>
       </div>
