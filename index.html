@@ -37,6 +37,7 @@
 
         <p id="time"></p>
         <p id="numExited"></p>
+        <p id="aveAll"></p>
 
         <div id="main" class="main">
           <svg
@@ -48,8 +49,8 @@
           ></svg>
         </div>
         <div id="graphs">
-          <div id="tester" style="width:100%; height:100%" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid meet"></div>
-          <div id="simulations" style="width:100%; height:100%" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid meet"></div>
+          <div id="tester" style="width:100%; height:100%" viewBox="0 0 2560 1600" preserveAspectRatio="xMidYMid meet"></div>
+          <div id="simulations" style="width:100%; height:100%" viewBox="0 0 2560 1600" preserveAspectRatio="xMidYMid meet"></div>
         </div>
         
         <!-- <div id="graphs">
@@ -137,6 +138,18 @@
                 value="1"
                 onchange="changeProb()"
               />.</label
+            >
+            <label for="animationDelay"
+              >Animation delay:
+              <input
+                type="text"
+                name="animationDelay"
+                id="animationDelay"
+                size="5"
+                value="10"
+                onclick="changeProb()"
+              />
+              milisecond(s).</label
             >
           </div>
 
@@ -284,6 +297,18 @@
               />
               seconds.</label
             >
+            <label for="randomChosenQueue"
+              >Randomly chosen queue:
+              <input
+                type="text"
+                name="randomChosenQueue"
+                id="randomChosenQueue"
+                size="5"
+                value="0.3"
+                onchange="changeProb()"
+              />
+              .</label
+            >
 
             <!-- <br />
             <label for="numPassengers"
@@ -299,18 +324,6 @@
             <br />
             <label for="timeSim">Simulation time:</label>
             <input type="text" name="timeSim" id="timeSim" size="5" value="0" /> -->
-            <label for="animationDelay"
-              >Animation delay:
-              <input
-                type="text"
-                name="animationDelay"
-                id="animationDelay"
-                size="5"
-                value="10"
-                onclick="changeProb()"
-              />
-              milisecond(s).</label
-            >
           </div>
         </div>
       </div>

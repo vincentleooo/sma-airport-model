@@ -155,14 +155,7 @@ label {
   justify-content: space-evenly;
 }
 
-@media (max-width:800px) {
-  .inputs {
-    display: list-item;
-    list-style: none;
-  }
-}
-
-#time, #numExited {
+#time, #numExited, #aveAll {
   font-size: small;
 }
 
@@ -170,3 +163,17 @@ label {
   display: flex;
   gap: 5px;
 }
+
+@media (max-width:800px) {
+  .inputs {
+    display: list-item;
+    list-style: none;
+  }
+}
+
+/* @media (max-width:1085px) {
+  #graphs {
+    display: list-item;
+    list-style: none;
+  }
+} */

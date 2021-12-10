@@ -32,6 +32,7 @@ var simulationsRan = 0;
 var listTimeToClear = [];
 var listMeanTimeToClear = [];
 var listSimulationRunTime = [];
+var listSimulationMeanRunTime = [];
 
 function changeProb() {
   if (isRunning || isPaused) {
@@ -49,6 +50,7 @@ function changeProb() {
     animationDelay = Number(document.getElementById("animationDelay").value);
     passengerCount = Number(document.getElementById("passengerCount").value);
     simulationRuns = Number(document.getElementById("simulationRuns").value);
+    randomChosenQueue = Number(document.getElementById("randomChosenQueue").value);
   }
 }
 
@@ -356,17 +358,25 @@ function createBaggageAreaQueue() {
 }
 
 function createTestingBox() {
+  // if (positions.testing > 0) {
+  //   let newRow = height / (numTestingDoctors + 1) - 20;
+  //   newRow = newRow.toFixed(0);
+  //   let newCol = (width * (positions.testing - 1)) / (numStations + 1);
+  //   newCol += 48;
+  //   newCol = newCol.toFixed(0);
+
+  //   let secondRow = (height * numTestingDoctors) / (numTestingDoctors + 1) + 28;
+  //   secondRow = secondRow.toFixed(0);
+
+  //   let newHeight = secondRow - newRow;
+
   if (positions.testing > 0) {
-    let newRow = height / (numTestingDoctors + 1) - 20;
+    let newRow = height * 0.35;
     newRow = newRow.toFixed(0);
-    let newCol = (width * (positions.testing - 1)) / (numStations + 1);
-    newCol += 48;
+    let newCol = (width * (positions.testing - 1)) / (numStations + 1) + 48;
     newCol = newCol.toFixed(0);
-
-    let secondRow = (height * numTestingDoctors) / (numTestingDoctors + 1) + 28;
-    secondRow = secondRow.toFixed(0);
-
-    let newHeight = secondRow - newRow;
+    let newHeight = height * 0.3;
+    newHeight = newHeight.toFixed(0);
 
     let newTestingBox = {
       row: newRow,
@@ -894,6 +904,30 @@ function updatePassenger(index) {
         newAvg =
           listTimeToClear.reduce((a, b) => a + b) / listTimeToClear.length;
         listMeanTimeToClear.push(newAvg);
+        let overallAvg;
+        if (listSimulationMeanRunTime.length > 0) {
+          overallAvg =
+            listSimulationMeanRunTime[listSimulationMeanRunTime.length - 1];
+          var overallStdDev = Math.sqrt(
+            listSimulationRunTime.map((x) => Math.pow(x - overallAvg, 2)).reduce((a, b) => a + b) /
+              listSimulationRunTime.length
+          );
+        } else {
+          overallAvg = 0;
+          var overallStdDev = 0;
+        }
+        document.getElementById("aveAll").innerHTML =
+          "Average time taken by a passenger: " +
+          newAvg.toFixed(2) +
+          ". Average time taken for " +
+          passengerCount +
+          " passenger(s): " +
+          overallAvg.toFixed(2) +
+          " over " +
+          simulationsRan +
+          " simulation(s) with a standard deviation of " +
+          overallStdDev.toFixed(2) +
+          ".";
         if (isRunning == true) {
           Plotly.extendTraces("tester", { y: [[getData1()]] }, [0]);
           cnt++;
@@ -941,6 +975,18 @@ function redrawWindow() {
   enteredPassengers = 0;
   listTimeToClear = [];
   listMeanTimeToClear = [];
+  let overallAvg;
+  if (listSimulationMeanRunTime.length > 0) {
+    overallAvg =
+      listSimulationMeanRunTime[listSimulationMeanRunTime.length - 1];
+    var overallStdDev = Math.sqrt(
+      listSimulationRunTime.map((x) => Math.pow(x - overallAvg, 2)).reduce((a, b) => a + b) /
+        listSimulationRunTime.length
+    );
+  } else {
+    overallAvg = 0;
+    var overallStdDev = 0;
+  }
   document.getElementById("time").innerHTML =
     "Current time is " +
     currentTime +
@@ -951,6 +997,18 @@ function redrawWindow() {
     " hours.";
   document.getElementById("numExited").innerHTML =
     "Number of exited passengers: " + exitedPassengers + ".";
+  document.getElementById("aveAll").innerHTML =
+    "Average time taken by a passenger: " +
+    0 +
+    ". Average time taken for " +
+    passengerCount +
+    " passenger(s): " +
+    overallAvg.toFixed(2) +
+    " over " +
+    simulationsRan +
+    " simulation(s) with a standard deviation of " +
+    overallStdDev.toFixed(2) +
+    ".";
   isPaused = false;
   isRunning = false;
   changeProb();
@@ -1203,8 +1261,9 @@ function redrawWindow() {
         },
       },
     ],
-    layout1
-  )
+    layout1,
+    {responsive: true}
+  );
 
   updateSurface();
 }
@@ -1245,6 +1304,11 @@ function simStep() {
       clearInterval(simTimer);
       simulationsRan += 1;
       listSimulationRunTime.push(currentTime);
+      let newAvg;
+      newAvg =
+        listSimulationRunTime.reduce((a, b) => a + b) /
+        listSimulationRunTime.length;
+      listSimulationMeanRunTime.push(newAvg);
       if (simulationsRan <= simulationRuns) {
         redrawWindow();
         isRunning = true;
@@ -1268,6 +1332,7 @@ function simStep() {
 function clearSimulationsRunTime() {
   simulationsRan = 0;
   listSimulationRunTime = [];
+  listSimulationMeanRunTime = [];
   Plotly.newPlot(
     "simulations",
     [
@@ -1280,7 +1345,8 @@ function clearSimulationsRunTime() {
         },
       },
     ],
-    layout1
+    layout2,
+    {responsive: true}
   );
 }
 
@@ -1304,7 +1370,8 @@ function runSim() {
     isNaN(testingTime) ||
     isNaN(animationDelay) ||
     isNaN(passengerCount) ||
-    isNaN(simulationRuns)
+    isNaN(simulationRuns) ||
+    isNaN(randomChosenQueue)
   ) {
     alert("At least one of the inputs is not a number.");
   } else {
@@ -1358,8 +1425,8 @@ function getData1() {
 }
 
 function getData2() {
-  if (listSimulationRunTime.length > 0) {
-    return listSimulationRunTime[listSimulationRunTime.length - 1];
+  if (listSimulationMeanRunTime.length > 0) {
+    return listSimulationMeanRunTime[listSimulationMeanRunTime.length - 1];
   } else {
     return 0;
   }
@@ -1372,17 +1439,17 @@ function getData2() {
 const layout1 = {
   paper_bgcolor: "rgba(0,0,0,0)",
   plot_bgcolor: "rgba(0,0,0,0)",
-  xaxis: { title: "Number of passengers", rangemode: "tozero"},
-  yaxis: { title: "Average time taken per passenger", rangemode: "tozero"},
-  font: {family: "Graphik"}
+  xaxis: { title: "Number of passengers", rangemode: "tozero" },
+  yaxis: { title: "Average time taken per passenger", rangemode: "tozero" },
+  font: { family: "Graphik", size: 11 },
 };
 
 const layout2 = {
   paper_bgcolor: "rgba(0,0,0,0)",
   plot_bgcolor: "rgba(0,0,0,0)",
-  xaxis: { title: "Number of simulations", rangemode: "tozero"},
-  yaxis: { title: "Average time taken per simulation", rangemode: "tozero"},
-  font: {family: "Graphik"}
+  xaxis: { title: "Number of simulations", rangemode: "tozero" },
+  yaxis: { title: "Average time taken per simulation", rangemode: "tozero" },
+  font: { family: "Graphik", size: 11 },
 };
 
 // const layout2 = {
@@ -1405,7 +1472,8 @@ Plotly.newPlot(
       },
     },
   ],
-  layout1
+  layout1,
+  {responsive: true}
 );
 
 Plotly.newPlot(
@@ -1420,7 +1488,8 @@ Plotly.newPlot(
       },
     },
   ],
-  layout2
+  layout2,
+  {responsive: true}
 );
 
 // Plotly.plot('chart2',[{
@@ -1461,7 +1530,8 @@ function ClearPlot(){
       },
     },
   ],
-  layout1
+  layout1,
+  {responsive: true}
 );
 }*/
 
