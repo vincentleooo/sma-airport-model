@@ -51,7 +51,9 @@ function changeProb() {
     animationDelay = Number(document.getElementById("animationDelay").value);
     passengerCount = Number(document.getElementById("passengerCount").value);
     simulationRuns = Number(document.getElementById("simulationRuns").value);
-    randomChosenQueue = Number(document.getElementById("randomChosenQueue").value);
+    randomChosenQueue = Number(
+      document.getElementById("randomChosenQueue").value
+    );
   }
 }
 
@@ -910,8 +912,9 @@ function updatePassenger(index) {
           overallAvg =
             listSimulationMeanRunTime[listSimulationMeanRunTime.length - 1];
           var overallStdDev = Math.sqrt(
-            listSimulationRunTime.map((x) => Math.pow(x - overallAvg, 2)).reduce((a, b) => a + b) /
-              listSimulationRunTime.length
+            listSimulationRunTime
+              .map((x) => Math.pow(x - overallAvg, 2))
+              .reduce((a, b) => a + b) / listSimulationRunTime.length
           );
         } else {
           overallAvg = 0;
@@ -981,8 +984,9 @@ function redrawWindow() {
     overallAvg =
       listSimulationMeanRunTime[listSimulationMeanRunTime.length - 1];
     var overallStdDev = Math.sqrt(
-      listSimulationRunTime.map((x) => Math.pow(x - overallAvg, 2)).reduce((a, b) => a + b) /
-        listSimulationRunTime.length
+      listSimulationRunTime
+        .map((x) => Math.pow(x - overallAvg, 2))
+        .reduce((a, b) => a + b) / listSimulationRunTime.length
     );
   } else {
     overallAvg = 0;
@@ -1263,7 +1267,7 @@ function redrawWindow() {
       },
     ],
     layout1,
-    {responsive: true}
+    { responsive: true }
   );
 
   updateSurface();
@@ -1342,7 +1346,8 @@ function simStep() {
       } else {
         isRunning = false;
         isPaused = false;
-        csvContent = listSimulationRunTime.join("\n");
+        csvContent =
+          "listSimulationRunTimes\n" + listSimulationRunTime.join("\n");
       }
     }
   }
@@ -1365,7 +1370,7 @@ function clearSimulationsRunTime() {
       },
     ],
     layout2,
-    {responsive: true}
+    { responsive: true }
   );
 }
 
@@ -1411,40 +1416,14 @@ function pause() {
 //   a.href = URL.createObjectURL(data);
 // }
 
-function download(content, filename, contentType)
-{
-  if(!contentType) contentType = 'application/octet-stream';
-      var a = document.createElement('a');
-      var blob = new Blob([content], {'type':contentType});
-      a.href = window.URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
+function download(content, filename, contentType) {
+  if (!contentType) contentType = "application/octet-stream";
+  var a = document.createElement("a");
+  var blob = new Blob([content], { type: contentType });
+  a.href = window.URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
 }
-
-/*
-
-//set dimensions and margins of the graph
-var margin = {top:10, right:10, bottom:10, left:10},
-  widthg1 = 960 - margin.left - margin.right,
-  heightg1 = 540 - margin.top = margin.bottom;
-
-//append the svg object to the body of the page
-var svg = d3.select("graph1")
-   .append("svg")
-     .attr("width", widthg1)
-     .attr("height", heightg1)
-   .append("g")
-     .attr("transform",
-           "translate(" + margin.left + "," + margin.top + ")");
-
-var xScale = d3.scaleLinear().domain([0,50]).range([0,width1 - margin.left - margin.right])
-var yScale = d3.scaleLinear().domain([0, 5000]).range([height1 - margin.top - margin.bottom,0])
-
-var line = d3.line().curve(d3.curveMonotoneX)
-  .x(function(d){ return xScale(d.x); })
-  .y(function(d){ return yScale(d.y); })
- 
-*/
 
 // set global variables
 const limit = 10000; // How many points can be on the graph before sliding occurs
@@ -1466,14 +1445,12 @@ function getData2() {
     return 0;
   }
 }
-// function getData2() {
-// 	return statistics[3].count;
-// 	}
 
 // set chart layout
 const layout1 = {
   title: {
-    text:'<b>Average Time Per Passenger in This Simulation</b>',},
+    text: "<b>Average Time Per Passenger in This Simulation</b>",
+  },
   paper_bgcolor: "rgba(0,0,0,0)",
   plot_bgcolor: "rgba(0,0,0,0)",
   xaxis: { title: "Number of passengers", rangemode: "tozero", dtick: 1 },
@@ -1483,20 +1460,14 @@ const layout1 = {
 
 const layout2 = {
   title: {
-    text:'<b>Average Time Per Simulation</b>',},
+    text: "<b>Average Time Per Simulation</b>",
+  },
   paper_bgcolor: "rgba(0,0,0,0)",
   plot_bgcolor: "rgba(0,0,0,0)",
-  xaxis: { title: "Number of simulations", rangemode: "tozero" , dtick: 1},
+  xaxis: { title: "Number of simulations", rangemode: "tozero", dtick: 1 },
   yaxis: { title: "Average time taken per simulation", rangemode: "tozero" },
   font: { family: "Graphik", size: 11 },
 };
-
-// const layout2 = {
-//   paper_bgcolor: 'rgba(0,0,0,0)',
-//   plot_bgcolor: 'rgba(0,0,0,0)',
-//   xaxis: {title: 'Time'},
-//   yaxis: {title: 'R0'}
-// };
 
 // plot all charts
 Plotly.newPlot(
@@ -1512,7 +1483,7 @@ Plotly.newPlot(
     },
   ],
   layout1,
-  {responsive: true}
+  { responsive: true }
 );
 
 Plotly.newPlot(
@@ -1528,50 +1499,10 @@ Plotly.newPlot(
     },
   ],
   layout2,
-  {responsive: true}
+  { responsive: true }
 );
-
-// Plotly.plot('chart2',[{
-// 	y:[getData2()],
-// 	mode:'lines',
-// 	line: {
-// 		color: 'rgb(255,0,0)',
-// 		width: 3 }
-// }], layout2);
 
 // set refresh interval and graph limit
 var cnt = 0;
-// setInterval(function () {
-//   if (isRunning == true) {
-//     Plotly.extendTraces("tester", { y: [[getData1()]] }, [0]);
-//     cnt++;
-//     if (cnt > limit) {
-//       Plotly.relayout("tester", {
-//         xaxis: {
-//           range: [cnt - limit, cnt],
-//         },
-//       });
-//     }
-//   }
-// }, refreshInterval);
-
-/*
-function ClearPlot(){
-  Plotly.newPlot(
-  "simulationRuns",
-  [
-    {
-      y: [getData1()],
-      mode: "lines",
-      line: {
-        color: "rebeccapurple",
-        width: 1,
-      },
-    },
-  ],
-  layout1,
-  {responsive: true}
-);
-}*/
 
 redrawWindow();

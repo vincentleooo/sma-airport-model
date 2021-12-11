@@ -7,25 +7,35 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.6.3.min.js"></script>
     <link rel="stylesheet" href="styles/stylesheet.css" />
-    <title>SMA Project</title>
+    <title>Airport Arrivals in a Post-Pandemic World</title>
   </head>
   <body>
     <div class="wrapper">
       <div>
-        <nav class="crumbs">
-          <ul>
-            <li class="crumb">
-              <a href="https://vinleonardo.com">Main Page</a>
-            </li>
-            <li class="crumb">
-              <a href="https://github.com/vincentleooo">GitHub Projects</a>
-            </li>
-          </ul>
-        </nav>
+        <p id="titlebar">🛬 <b>Airport Arrivals in a Post-Pandemic World</b></p>
+        <div name="navbar">
+          <nav class="crumbs">
+            <ul>
+              <li class="crumb">
+                <a href="./index.html">Home</a>
+              </li>
+              <li class="crumb">
+                <a href="https://github.com/vincentleooo/sma-airport-model">Repository</a>
+              </li>
+              <li class="crumb">
+                <a href="https://github.com/vincentleooo">Other Projects</a>
+              </li>
+              <li class="crumb">
+                <a href="./documentations.html">Docs</a>
+              </li>
+            </ul>
+          </nav>
 
-        <h2>
+        </div>
+
+        <h1>
           Agent-Based Modelling for Airport Arrivals in a Post-Pandemic World
-        </h2>
+        </h1>
 
         <!-- <p> Instructions:
           <ol>
@@ -49,10 +59,20 @@
           ></svg>
         </div>
         <div id="graphs">
-          <div id="tester" style="width:100%; height:100%" viewBox="0 0 2560 1600" preserveAspectRatio="xMidYMid meet"></div>
-          <div id="simulations" style="width:100%; height:100%" viewBox="0 0 2560 1600" preserveAspectRatio="xMidYMid meet"></div>
+          <div
+            id="tester"
+            style="width: 100%; height: 100%"
+            viewBox="0 0 2560 1600"
+            preserveAspectRatio="xMidYMid meet"
+          ></div>
+          <div
+            id="simulations"
+            style="width: 100%; height: 100%"
+            viewBox="0 0 2560 1600"
+            preserveAspectRatio="xMidYMid meet"
+          ></div>
         </div>
-        
+
         <!-- <div id="graphs">
           <svg
             id="graph1"
@@ -75,8 +95,19 @@
         <div class="simulate">
           <button class="button" onclick="runSim()">Start</button>
           <button class="button" onclick="pause()">Pause</button>
-          <button class="button" onclick="csvContent = 'listSimulationRunTimes\n';clearInterval(simTimer);clearSimulationsRunTime();redrawWindow();">Reset</button>
-          <button class="button" id="download" onclick="download(csvContent, 'listSimulationRunTimes.csv', 'text/csv');">Download CSV</button>
+          <button
+            class="button"
+            onclick="csvContent = 'listSimulationRunTimes\n';clearInterval(simTimer);clearSimulationsRunTime();redrawWindow();"
+          >
+            Reset
+          </button>
+          <button
+            class="button"
+            id="download"
+            onclick="download(csvContent, 'listSimulationRunTimes.csv', 'text/csv');"
+          >
+            Download CSV (Time Per Simulation)
+          </button>
           <!--
             <button class="button" onclick="update(data1)">Agent</button>
             <button class="button" onclick="update(data2")>Doctor</button>
@@ -296,7 +327,7 @@
                 value="900"
                 onchange="changeProb()"
               />
-              seconds.</label
+              second(s).</label
             >
             <label for="randomChosenQueue"
               >Randomly chosen queue:
@@ -331,7 +362,7 @@
 
       <footer class="footer">
         <p>
-          Copyright 2021 by Vincent Leonardo, Sarah Wong, and Sarah Ramjoo. All
+          Copyright &copy; 2021 by Vincent Leonardo, Sarah Wong I-Mae, and Sarah Ramjoo. All
           rights reserved.
         </p>
       </footer>
