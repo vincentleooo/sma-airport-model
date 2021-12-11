@@ -1322,7 +1322,7 @@ function simStep() {
             });
           }
         }
-      } else if (simulationsRan == simulationRuns) {
+      } else if (simulationsRan == simulationRuns && isRunning) {
         redrawWindow();
         isRunning = true;
         if (isRunning == true) {
@@ -1336,6 +1336,7 @@ function simStep() {
             });
           }
         }
+        isRunning = false;
       } else {
         isRunning = false;
         isPaused = false;
