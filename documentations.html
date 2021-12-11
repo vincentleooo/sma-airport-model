@@ -102,26 +102,32 @@
         <h2>Behaviours and code</h2>
 
         <p>This is going to be a high level description of the model, written in the perception of an individual agent.</p>
-
-        <script src="https://gist.github.com/vincentleooo/a00699ca2dde5024b171e38fe5aca7cb.js"></script>
-
+        
+        <!-- <figure id="gists">
+          <script src="https://gist.github.com/vincentleooo/a00699ca2dde5024b171e38fe5aca7cb.js"></script>
+        </figure> -->
+          
         <p>This shows the code for each second passing. Firstly, it is the garbage collection. This means that it will try to clear out whichever agent is at the going out state. Afterwards, it will create new passengers based on the rates set by the user as long as the number of passengers does not exceed the specified amount of passengers. It will then update the positions of all the agents in the simulation based on their target locations.</p>
 
         <h3>Removing passengers</h3>
 
-        <script src="https://gist.github.com/vincentleooo/b3c0ce0523d89e47d59c05e5fa7e49c8.js"></script>
+        <!-- <figure id="gists">
+          <script src="https://gist.github.com/vincentleooo/b3c0ce0523d89e47d59c05e5fa7e49c8.js"></script>
+        </figure> -->
 
         <p>In removing the passengers, it deletes both the passengers data and the data associated with the animation.</p>
 
         <h3>Adding passengers</h3>
-
-        <script src="https://gist.github.com/vincentleooo/8b204fa2a7189544e61f038f6f36dc8b.js"></script>
+        <!-- <figure id="gists">
+          <script src="https://gist.github.com/vincentleooo/8b204fa2a7189544e61f038f6f36dc8b.js"></script>
+        </figure> -->
 
         <p>In this case, it will follow a process of finding the next station. It will either choose the queue lane for the next station rationally based on queue lengths or based on random choice. This parameter is set by the user. Afterwards, other attributes are assigned to keep track of its state. The user's choice for COVID infected probability will affect how many passengers have COVID.</p>
 
         <h3>Updating passengers</h3>
-
-        <script src="https://gist.github.com/vincentleooo/0a80286d963ba66578589eab0f373d00.js"></script>
+        <figure id="gists">
+          <script src="https://gist.github.com/vincentleooo/0a80286d963ba66578589eab0f373d00.js"></script>
+        </figure>
 
         <p>In updating the passenger, there will be roughly two different states. One is when the passenger is still on the way to a target, and one where the passenger has reached a target. Depending on the station, the passenger will do different things.</p>
 
@@ -131,6 +137,8 @@
 
         <h2>License</h2>
         <p>This project is licensed under the MIT license. It can be seen <a href="./LICENSE">here</a>.</p>
+
+        
     </div>
     <footer class="footer">
       <p>
