@@ -230,13 +230,6 @@ figcaption {
 #toc_container ul li {
   list-style: outside none none !important;
 } */
-.gist {
-  max-width: 100%;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  overflow: auto;
-}
 
 .gist .blob-wrapper.data {
   max-height:500px;
