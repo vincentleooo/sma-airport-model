@@ -75,7 +75,8 @@
         <div class="simulate">
           <button class="button" onclick="runSim()">Start</button>
           <button class="button" onclick="pause()">Pause</button>
-          <button class="button" onclick="clearInterval(simTimer);clearSimulationsRunTime();redrawWindow();">Reset</button>
+          <button class="button" onclick="csvContent = 'listSimulationRunTimes\n';clearInterval(simTimer);clearSimulationsRunTime();redrawWindow();">Reset</button>
+          <button class="button" id="download" onclick="download(csvContent, 'listSimulationRunTimes.csv', 'text/csv');">Download CSV</button>
           <!--
             <button class="button" onclick="update(data1)">Agent</button>
             <button class="button" onclick="update(data2")>Doctor</button>

@@ -171,9 +171,9 @@ label {
   }
 }
 
-/* @media (max-width:1085px) {
+@media (max-width:720px) {
   #graphs {
     display: list-item;
     list-style: none;
   }
-} */
+}

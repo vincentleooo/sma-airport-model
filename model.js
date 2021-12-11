@@ -33,6 +33,7 @@ var listTimeToClear = [];
 var listMeanTimeToClear = [];
 var listSimulationRunTime = [];
 var listSimulationMeanRunTime = [];
+var csvContent = "listSimulationRunTimes\n";
 
 function changeProb() {
   if (isRunning || isPaused) {
@@ -1309,7 +1310,7 @@ function simStep() {
         listSimulationRunTime.reduce((a, b) => a + b) /
         listSimulationRunTime.length;
       listSimulationMeanRunTime.push(newAvg);
-      if (simulationsRan <= simulationRuns) {
+      if (simulationsRan < simulationRuns) {
         redrawWindow();
         isRunning = true;
         simTimer = window.setInterval(simStep, animationDelay);
@@ -1324,6 +1325,24 @@ function simStep() {
             });
           }
         }
+      } else if (simulationsRan == simulationRuns) {
+        redrawWindow();
+        isRunning = true;
+        if (isRunning == true) {
+          Plotly.extendTraces("simulations", { y: [[getData2()]] }, [0]);
+          cnt++;
+          if (cnt > limit) {
+            Plotly.relayout("simulations", {
+              xaxis: {
+                range: [cnt - limit, cnt],
+              },
+            });
+          }
+        }
+      } else {
+        isRunning = false;
+        isPaused = false;
+        csvContent = listSimulationRunTime.join("\n");
       }
     }
   }
@@ -1386,6 +1405,22 @@ function pause() {
   clearInterval(simTimer);
 }
 
+// function downloadCSV() {
+//   let data = new Blob([csvContent]);
+//   let a = document.getElementById("download");
+//   a.href = URL.createObjectURL(data);
+// }
+
+function download(content, filename, contentType)
+{
+  if(!contentType) contentType = 'application/octet-stream';
+      var a = document.createElement('a');
+      var blob = new Blob([content], {'type':contentType});
+      a.href = window.URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+}
+
 /*
 
 //set dimensions and margins of the graph
@@ -1437,17 +1472,21 @@ function getData2() {
 
 // set chart layout
 const layout1 = {
+  title: {
+    text:'<b>Average Time Per Passenger in This Simulation</b>',},
   paper_bgcolor: "rgba(0,0,0,0)",
   plot_bgcolor: "rgba(0,0,0,0)",
-  xaxis: { title: "Number of passengers", rangemode: "tozero" },
+  xaxis: { title: "Number of passengers", rangemode: "tozero", dtick: 1 },
   yaxis: { title: "Average time taken per passenger", rangemode: "tozero" },
   font: { family: "Graphik", size: 11 },
 };
 
 const layout2 = {
+  title: {
+    text:'<b>Average Time Per Simulation</b>',},
   paper_bgcolor: "rgba(0,0,0,0)",
   plot_bgcolor: "rgba(0,0,0,0)",
-  xaxis: { title: "Number of simulations", rangemode: "tozero" },
+  xaxis: { title: "Number of simulations", rangemode: "tozero" , dtick: 1},
   yaxis: { title: "Average time taken per simulation", rangemode: "tozero" },
   font: { family: "Graphik", size: 11 },
 };
