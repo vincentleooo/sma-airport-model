@@ -34,6 +34,8 @@ var listMeanTimeToClear = [];
 var listSimulationRunTime = [];
 var listSimulationMeanRunTime = [];
 var csvContent = "listSimulationRunTimes\n";
+var overallStdDev = 0;
+var overallAvg = 0;
 
 function changeProb() {
   if (isRunning || isPaused) {
@@ -904,22 +906,9 @@ function updatePassenger(index) {
         document.getElementById("numExited").innerHTML =
           "Number of exited passengers: " + exitedPassengers + ".";
         listTimeToClear.push(Number(passenger.timeTaken));
-        newAvg =
+        let newAvg =
           listTimeToClear.reduce((a, b) => a + b) / listTimeToClear.length;
         listMeanTimeToClear.push(newAvg);
-        let overallAvg;
-        if (listSimulationMeanRunTime.length > 0) {
-          overallAvg =
-            listSimulationMeanRunTime[listSimulationMeanRunTime.length - 1];
-          var overallStdDev = Math.sqrt(
-            listSimulationRunTime
-              .map((x) => Math.pow(x - overallAvg, 2))
-              .reduce((a, b) => a + b) / listSimulationRunTime.length
-          );
-        } else {
-          overallAvg = 0;
-          var overallStdDev = 0;
-        }
         document.getElementById("aveAll").innerHTML =
           "Average time taken by a passenger: " +
           newAvg.toFixed(2) +
@@ -983,14 +972,14 @@ function redrawWindow() {
   if (listSimulationMeanRunTime.length > 0) {
     overallAvg =
       listSimulationMeanRunTime[listSimulationMeanRunTime.length - 1];
-    var overallStdDev = Math.sqrt(
+    overallStdDev = Math.sqrt(
       listSimulationRunTime
         .map((x) => Math.pow(x - overallAvg, 2))
         .reduce((a, b) => a + b) / listSimulationRunTime.length
     );
   } else {
     overallAvg = 0;
-    var overallStdDev = 0;
+    overallStdDev = 0;
   }
   document.getElementById("time").innerHTML =
     "Current time is " +
@@ -1309,11 +1298,15 @@ function simStep() {
       clearInterval(simTimer);
       simulationsRan += 1;
       listSimulationRunTime.push(currentTime);
-      let newAvg;
-      newAvg =
+      overallAvg =
         listSimulationRunTime.reduce((a, b) => a + b) /
         listSimulationRunTime.length;
-      listSimulationMeanRunTime.push(newAvg);
+      listSimulationMeanRunTime.push(overallAvg);
+      overallStdDev = Math.sqrt(
+        listSimulationRunTime
+          .map((x) => Math.pow(x - overallAvg, 2))
+          .reduce((a, b) => a + b) / listSimulationRunTime.length
+      );
       if (simulationsRan < simulationRuns) {
         redrawWindow();
         isRunning = true;
@@ -1453,8 +1446,8 @@ const layout1 = {
   },
   paper_bgcolor: "rgba(0,0,0,0)",
   plot_bgcolor: "rgba(0,0,0,0)",
-  xaxis: { title: "Number of passengers", rangemode: "tozero", dtick: 1 },
-  yaxis: { title: "Average time taken per passenger", rangemode: "tozero" },
+  xaxis: { title: "Number of passengers", rangemode: "tozero" },
+  yaxis: { title: "Average time taken per passenger (s)", rangemode: "tozero" },
   font: { family: "Graphik", size: 11 },
 };
 
@@ -1464,8 +1457,8 @@ const layout2 = {
   },
   paper_bgcolor: "rgba(0,0,0,0)",
   plot_bgcolor: "rgba(0,0,0,0)",
-  xaxis: { title: "Number of simulations", rangemode: "tozero", dtick: 1 },
-  yaxis: { title: "Average time taken per simulation", rangemode: "tozero" },
+  xaxis: { title: "Number of simulations", rangemode: "tozero"},
+  yaxis: { title: "Average time taken per simulation (s)", rangemode: "tozero" },
   font: { family: "Graphik", size: 11 },
 };
 
