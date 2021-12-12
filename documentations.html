@@ -1,27 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://cdn.plot.ly/plotly-2.6.3.min.js"></script>
-  <link rel="stylesheet" href="./styles/stylesheet.css" />
-  <title>Documentations - Airport Arrivals in a Post-Pandemic World</title>
-  <title>Document</title>
-</head>
-<body>
-  <div class="wrapper">
-    <div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.6.3.min.js"></script>
+    <link rel="stylesheet" href="./styles/stylesheet.css" />
+    <title>Documentations - Airport Arrivals in a Post-Pandemic World</title>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div>
         <div name="navbar">
-          <p id="titlebar">🛬 <b>Airport Arrivals in a Post-Pandemic World</b></p>
+          <p id="titlebar">
+            🛬 <b>Airport Arrivals in a Post-Pandemic World</b>
+          </p>
           <nav class="crumbs">
             <ul>
               <li class="crumb">
-                <a href="./index.html">Home</a>
+                <a href="./">Home</a>
               </li>
               <li class="crumb">
-                <a href="https://github.com/vincentleooo/sma-airport-model">Repository</a>
+                <a href="https://github.com/vincentleooo/sma-airport-model"
+                  >Repository</a
+                >
               </li>
               <li class="crumb">
                 <a href="https://github.com/vincentleooo">Other Projects</a>
@@ -34,112 +38,447 @@
         </div>
 
         <h1>Documentations</h1>
-        <h2>User manual</h2>
-        <h3>UI elements</h3>
-        <p>The lines before the simulation box denote the changing variables during the simulation. This includes the time within the current simulation, the number of exited passengers within the current simulation, and the average time taken per passenger within the current simulation along with the average time taken to finish one simulation and its standard deviation over the set amount of simulations.</p>
-        
+
+        <h2>Table of contents</h2>
+        <ul>
+          <li>
+            <a href="#dependencies">Dependencies</a>
+          </li>
+          <li>
+            <a href="#usermanual">User manual</a>
+            <ul>
+              <li><a href="#objectives">Objectives</a></li>
+              <li><a href="#uielements">UI elements</a></li>
+              <li><a href="#inputs">Inputs</a></li>
+            </ul>
+          </li>
+          <li>
+            <a href="#technical">Behaviours and code</a>
+            <ul>
+              <li><a href="#removingpassengers">Removing passengers</a></li>
+              <li><a href="#addingpassengers">Adding passengers</a></li>
+              <li><a href="#updatingpassengers">Updating passengers</a></li>
+              <li><a href="#areacreations">Area creations and modularity</a></li>
+              <li><a href="#frontend">Front-end niceties</a></li>
+            </ul>
+          </li>
+        </ul>
+
+        <h2 id="dependencies">Dependencies</h2>
+        <p>
+          An internet connection is required to access outside libraries. A
+          modern browser updated within this year (2021) is preferred due to
+          some newer CSS dependencies.
+        </p>
+
+        <h2 id="usermanual">User manual</h2>
+
+        <h3 id="objectives">Objectives</h3>
+
+        <p>
+          The objective of this simulation is to bring a passenger from the the
+          plane (left border) and out of the system. There are two ways of
+          exiting: one is through the normal way of clearing the defined
+          stations, the other is when, if there is a testing station, the
+          passenger tested positive for COVID-19. The behaviour of the
+          passengers is that they will all walk at the same speed without social
+          distancing, always moving forward, and selection of queues will be
+          done either randomly or in choosing the shortest queue (user-set
+          probability). Moreover, for COVID-19 testings, everything is assumed
+          to be 100% accurate.
+        </p>
+
+        <h4>Immigration station</h4>
+
+        <p>
+          The immigration station is comprised of pair-wise queue lanes and
+          booths. The behaviour is a simple one in that passengers will queue
+          and wait for their turn to go next into the booth.
+        </p>
+
+        <h4>Testing station</h4>
+
+        <p>
+          The testing station is similar to the immigration station. But, after
+          the booth, the passengers go into a waiting area where they randomly
+          choose their sitting positions to wait for a set amount of time.
+        </p>
+
+        <h4>Baggage area</h4>
+
+        <p>
+          The baggage area is simple. It contains a lane to enter in (which is
+          not a queue) and a baggage area afterwards. This is, of course,
+          assuming that the baggages are not on carousels as per normal, but
+          left down on the ground due to the special circumstances. The
+          passenger will try to look for their baggages within this area and
+          then leave.
+        </p>
+
+        <h3 id="uielements">UI elements</h3>
+        <p>
+          The lines before the simulation box denote the changing variables
+          during the simulation. This includes the time within the current
+          simulation, the number of exited passengers within the current
+          simulation, and the average time taken per passenger within the
+          current simulation along with the average time taken to finish one
+          simulation and its standard deviation over the set amount of
+          simulations.
+        </p>
+
         <figure>
-          <img src="./img/befSimBox.png" alt="Before the simulation box" class="responsive">
+          <img
+            src="./img/befSimBox.png"
+            alt="Before the simulation box"
+            class="responsive"
+          />
           <figcaption>Above the simulation box</figcaption>
         </figure>
 
-        <p>The model box will draw according to the inputs set under the heading <b>Stations</b>.</p>
+        <p>
+          The model box will draw according to the inputs set under the heading
+          <b>Stations</b>.
+        </p>
 
-        <p>Below the simulation box, there are two graphs: one to track the average time taken per passenger within one simulation run, and the other one to track the average time taken to finish one simulation run.</p>
+        <p>
+          Below the simulation box, there are two graphs: one to track the
+          average time taken per passenger within one simulation run, and the
+          other one to track the average time taken to finish one simulation
+          run.
+        </p>
 
         <figure>
-          <img src="./img/graphs.png" alt="Graphs" class="responsive">
+          <img src="./img/graphs.png" alt="Graphs" class="responsive" />
           <figcaption>Graphs below the simulation box</figcaption>
         </figure>
 
-        <p>Right below that, there are control buttons to start, pause, and reset the simulations. It is also possible to download the data collected for the time taken per simulation over one or multiple simulations as a CSV file.</p>
+        <p>
+          Right below that, there are control buttons to start, pause, and reset
+          the simulations. It is also possible to download the data collected
+          for the time taken per simulation over one or multiple simulations as
+          a CSV file.
+        </p>
 
         <figure>
-          <img src="./img/buttons.png" alt="Buttons controlling simulation" class="responsive">
+          <img
+            src="./img/buttons.png"
+            alt="Buttons controlling simulation"
+            class="responsive"
+          />
           <figcaption>Buttons controlling simulation</figcaption>
         </figure>
 
-        <h3>Inputs</h3>
+        <h3 id="inputs">Inputs</h3>
 
-        There are three different sections covering different aspects of the simulation. One is <b>Stations</b>, which covers both the layout of the stations within the simulation box and the global simulation settings. The next one is <b>Station Parameters</b>, which is used to customise how many booths or lanes each station has. The final one is <b>Agent Parameters</b>, which control the agents' behaviours and time taken to go through each station.
+        There are three different sections covering different aspects of the
+        simulation. One is <b>Stations</b>, which covers both the layout of the
+        stations within the simulation box and the global simulation settings.
+        The next one is <b>Station Parameters</b>, which is used to customise
+        how many booths or lanes each station has. The final one is
+        <b>Agent Parameters</b>, which control the agents' behaviours and time
+        taken to go through each station.
 
         <figure>
-          <img src="./img/inputs.png" alt="Inputs" class="responsive">
+          <img src="./img/inputs.png" alt="Inputs" class="responsive" />
           <figcaption>Inputs</figcaption>
         </figure>
 
         <h4>Stations</h4>
 
-        <p>There must be at least one choice of station for the simulation to run. The station numbers correspond to their position on the simulation box from left to right. For example, the picture below shows when Station 1 is Immigration, Station 2 is Testing, and Station 3 is Baggage.</p>
+        <p>
+          There must be at least one choice of station for the simulation to
+          run. The station numbers correspond to their position on the
+          simulation box from left to right. For example, the picture below
+          shows when Station 1 is Immigration, Station 2 is Testing, and Station
+          3 is Baggage.
+        </p>
 
         <figure>
-          <img src="./img/example1.png" alt="Example position" class="responsive">
+          <img
+            src="./img/example1.png"
+            alt="Example position"
+            class="responsive"
+          />
           <figcaption>Example position</figcaption>
         </figure>
 
-        The wide rectangle on the left of each station is the queue or lane. The booths are represented by the solid squares. The tall rectangles on the right of the Testing and Baggage stations are for waiting areas and baggage collection areas respectively.
+        The wide rectangle on the left of each station is the queue or lane. The
+        booths are represented by the solid squares. The tall rectangles on the
+        right of the Testing and Baggage stations are for waiting areas and
+        baggage collection areas respectively.
 
         <h4>Station Parameters</h4>
 
-        The dropdowns denote the amount (from one to ten) of booths, queues, or lanes provided in the simulation for each station. An example for when the immigration booth is set to have five booths is as follows.
+        The dropdowns denote the amount (from one to ten) of booths, queues, or
+        lanes provided in the simulation for each station. An example for when
+        the immigration booth is set to have five booths is as follows.
 
         <figure>
-          <img src="./img/example2.png" alt="Example of multiple queues" class="responsive1">
+          <img
+            src="./img/example2.png"
+            alt="Example of multiple queues"
+            class="responsive1"
+          />
           <figcaption>Example of multiple booths and queues</figcaption>
         </figure>
 
         <h4>Agent Parameters</h4>
-        The rates that are denoted in seconds will be converted into their per-second probability (its inverse), excepting the COVID test time, which is a definite time delay. This meant that the probability, for example, of an arrival rate of 30 seconds will be 1/30 per second.
+        The rates that are denoted in seconds will be converted into their
+        per-second probability (its inverse), excepting the COVID test time,
+        which is a definite time delay. This meant that the probability, for
+        example, of an arrival rate of 30 seconds will be 1/30 per second.
 
-        <ul><li>Arrival rate: the mean time taken for each passenger to enter the simulation.</li>
-        <li>Immigration rate: the mean time to clear immigration for each passenger</li>
-        <li>Testing rate: the mean time to clear the testing booth.</li>
-        <li>COVID probability: the probability of each passenger having COVID.</li>
-        <li>Baggage collection probability: the probability that when a passenger reaches the baggage area, their baggage is found.</li>
-        <li>COVID test time: the time taken to clear the COVID test.</li>
-        <li>Randomly chosen queue: the probability that a passenger will deviate from the rational queue choice (shortest queue).</li></ul>
+        <ul>
+          <li>
+            Arrival rate: the mean time taken for each passenger to enter the
+            simulation.
+          </li>
+          <li>
+            Immigration rate: the mean time to clear immigration for each
+            passenger
+          </li>
+          <li>Testing rate: the mean time to clear the testing booth.</li>
+          <li>
+            COVID probability: the probability of each passenger having COVID.
+          </li>
+          <li>
+            Baggage collection probability: the probability that when a
+            passenger reaches the baggage area, their baggage is found.
+          </li>
+          <li>COVID test time: the time taken to clear the COVID test.</li>
+          <li>
+            Randomly chosen queue: the probability that a passenger will deviate
+            from the rational queue choice (shortest queue).
+          </li>
+        </ul>
 
-        <h2>Behaviours and code</h2>
+        <h2 id="technical">Behaviours and code</h2>
 
-        <p>This is going to be a high level description of the model, written in the perception of an individual agent.</p>
-        
-        <iframe src="https://www.thiscodeworks.com/embed/61b4af84fe9bbd0015d5e7f1" style="width: 100%; height: 333px;" frameborder="0"></iframe>
-          
-        <p>This shows the code for each second passing. Firstly, it is the garbage collection. This means that it will try to clear out whichever agent is at the going out state. Afterwards, it will create new passengers based on the rates set by the user as long as the number of passengers does not exceed the specified amount of passengers. It will then update the positions of all the agents in the simulation based on their target locations.</p>
+        <p>
+          This is going to be a high level description of the model, written in
+          the perception of an individual agent. The animations are done using
+          the <a href="https://d3js.org">D3.js</a> library.
+        </p>
 
-        <h3>Removing passengers</h3>
+        <iframe
+          src="https://www.thiscodeworks.com/embed/61b4af84fe9bbd0015d5e7f1"
+          style="
+            width: 100%;
+            height: 333px;
+            border-radius: 12px;
+            overflow: clip;
+          "
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
 
-        
-        <p>In removing the passengers, it deletes both the passengers data and the data associated with the animation.</p>
-        <iframe src="https://www.thiscodeworks.com/embed/61b4b05cfe9bbd0015d5e7f2" style="width: 100%; height: 216px;" frameborder="0"></iframe>
-        
-        <h3>Adding passengers</h3>
-        
-        <p>In this case, it will follow a process of finding the next station. It will either choose the queue lane for the next station rationally based on queue lengths or based on random choice. This parameter is set by the user. Afterwards, other attributes are assigned to keep track of its state. The user's choice for COVID infected probability will affect how many passengers have COVID.</p>
-        <iframe src="https://www.thiscodeworks.com/embed/61b4b094fe9bbd0015d5e7f3" style="width: 100%; height: 957px;" frameborder="0"></iframe>
+        <p>
+          This shows the code for each second passing. Firstly, it is the
+          garbage collection. This means that it will try to clear out whichever
+          agent is at the going out state. Afterwards, it will create new
+          passengers based on the rates set by the user as long as the number of
+          passengers does not exceed the specified amount of passengers. It will
+          then update the positions of all the agents in the simulation based on
+          their target locations.
+        </p>
 
-        <h3>Updating passengers</h3>
+        <h3 id="removingpassengers">Removing passengers</h3>
 
-        
-        <p>In updating the passenger, there will be roughly two different states. One is when the passenger is still on the way to a target, and one where the passenger has reached a target. Depending on the station, the passenger will do different things.</p>
-        
-        <p>At the immigration booth, the passenger will queue up until it is their turn. After coming out of the booth, it will select the next station. At the testing booth, the passenger will also queue up to get tested. Afterwards, it is a free seating environment within the area used to wait for test results. At the baggage collection area, the passenger will go through the lanes into a space where the baggages are placed. They will then try to find their baggages. This probability is set by the user. If the next station is to go out, they will then proceed to go to the exit node.</p>
-        
-        <p>For COVID patients who are screened during testing, they will go out via a different path, thus reducing their time taken to go through the simulation.</p>
-        
-        <iframe src="https://www.thiscodeworks.com/embed/61b4b185fe9bbd0015d5e7f4" style="width: 100%; height: 5884px;" frameborder="0"></iframe>
+        <p>
+          In removing the passengers, it deletes both the passengers data and
+          the data associated with the animation.
+        </p>
+        <iframe
+          src="https://www.thiscodeworks.com/embed/61b4b05cfe9bbd0015d5e7f2"
+          style="
+            width: 100%;
+            height: 216px;
+            border-radius: 12px;
+            overflow: clip;
+          "
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+
+        <h3 id="addingpassengers">Adding passengers</h3>
+
+        <p>
+          In this case, it will follow a process of finding the next station. It
+          will either choose the queue lane for the next station rationally
+          based on queue lengths or based on random choice. This parameter is
+          set by the user. Afterwards, other attributes are assigned to keep
+          track of its state. The user's choice for COVID infected probability
+          will affect how many passengers have COVID.
+        </p>
+        <iframe
+          src="https://www.thiscodeworks.com/embed/61b4b094fe9bbd0015d5e7f3"
+          style="
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            overflow: clip;
+          "
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+
+        <h3 id="updatingpassengers">Updating passengers</h3>
+
+        <p>
+          In updating the passenger, there will be roughly two different states.
+          One is when the passenger is still on the way to a target, and one
+          where the passenger has reached a target. Depending on the station,
+          the passenger will do different things.
+        </p>
+
+        <p>
+          At the immigration booth, the passenger will queue up until it is
+          their turn. After coming out of the booth, it will select the next
+          station. At the testing booth, the passenger will also queue up to get
+          tested. Afterwards, it is a free seating environment within the area
+          used to wait for test results. At the baggage collection area, the
+          passenger will go through the lanes into a space where the baggages
+          are placed. They will then try to find their baggages. This
+          probability is set by the user. If the next station is to go out, they
+          will then proceed to go to the exit node.
+        </p>
+
+        <p>
+          For COVID patients who are screened during testing, they will go out
+          via a different path, thus reducing their time taken to go through the
+          simulation.
+        </p>
+
+        <iframe
+          src="https://www.thiscodeworks.com/embed/61b4b185fe9bbd0015d5e7f4"
+          style="
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            overflow: clip;
+          "
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+
+        <h3 id="areacreations">Area creations and modularity</h3>
+        <h4 id="jshacks">
+          JavaScript objects and using different ways to get keys or values
+        </h4>
+
+        <p>
+          The example below shows the different ways to get keys or values
+          within an object. This is how the model was able to find the positions
+          of the stations based on what is set by the user and to connect the
+          pieces together such that the passenger can find the next station and
+          hence the queue. The object keys associated with queues are always
+          called <tt>{station} + Queue</tt>. This leads to the stations behaving
+          like Lego blocks, being able to connect with any other station with a
+          standard input/output.
+        </p>
+        <iframe
+          src="https://www.thiscodeworks.com/embed/61b5cbaa2ecc3700152aa61a"
+          style="
+            width: 100%;
+            height: 476px;
+            border-radius: 12px;
+            overflow: clip;
+          "
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+
+        <h4>Area creation</h4>
+
+        <p>
+          The creation of the areas will depend on whether the positions of the
+          stations are defined (>0 in this case). Depending on the number of
+          queues or booths set, the <tt>objects</tt> object will be modified
+          where the stations' booths or queues will be added in such that it can
+          be generated later on. Below is an example for the immigration booth.
+        </p>
+        <iframe
+          src="https://www.thiscodeworks.com/embed/61b5ce742ecc3700152aa61d"
+          style="
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            overflow: clip;
+          "
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+
+        <h4>Tracking states and substates</h4>
+        <p>
+          The passengers have a <tt>state</tt> to denote which station to go,
+          and a <tt>queueState</tt> to denote which part of each station to go
+          to. They also have the <tt>station</tt> integer key to denote which
+          part of the simulation box they are in, and as such they can track
+          their progress and go find which station is in the next part using the
+          tricks mentioned <a href="#jshacks">above</a>.
+        </p>
+        <h3 id="frontend">Front-end niceties</h3>
+        <h4>Inputs and value-safety</h4>
+        <p>
+          These are some of the functions that help to key in inputs from the
+          front-end and to ensure that they are tenable.
+        </p>
+        <iframe
+          src="https://www.thiscodeworks.com/embed/61b5d22e2ecc3700152aa61e"
+          style="
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            overflow: clip;
+          "
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+        <h4>Plots</h4>
+        <p>
+          The plots are made using
+          <a href="https://plotly.com/javascript/">Plotly</a>.
+        </p>
+        <iframe
+          src="https://www.thiscodeworks.com/embed/61b5d2d32ecc3700152aa61f"
+          style="
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            overflow: clip;
+          "
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+        <h4>Downloads</h4>
+        <p>
+          The downloading function takes in the CSV string and converts it to be
+          downloaded as a proper CSV file.
+        </p>
+        <iframe
+          src="https://www.thiscodeworks.com/embed/61b5d34f2ecc3700152aa620"
+          style="
+            width: 100%;
+            height: 216px;
+            border-radius: 12px;
+            overflow: clip;
+          "
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
         <h2>License</h2>
-        <p>This project is licensed under the MIT license. It can be seen <a href="./LICENSE">here</a>.</p>
-
-        
+        <p>
+          This project is licensed under the MIT license. It can be seen
+          <a href="./LICENSE">here</a>.
+        </p>
+      </div>
+      <footer class="footer">
+        <p>
+          Copyright &copy; 2021 by Vincent Leonardo, Sarah Wong I-Mae, and Sarah
+          Ramjoo. All rights reserved.
+        </p>
+      </footer>
     </div>
-    <footer class="footer">
-      <p>
-        Copyright &copy; 2021 by Vincent Leonardo, Sarah Wong I-Mae, and Sarah Ramjoo. All
-        rights reserved.
-      </p>
-    </footer>
-  </div>
-  
-</body>
+  </body>
 </html>
