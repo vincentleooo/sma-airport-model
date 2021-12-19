@@ -903,13 +903,13 @@ function updatePassenger(index) {
       if (hasArrived) {
         passenger.state = "out";
         exitedPassengers += 1;
-        document.getElementById("numExited").innerHTML =
+        document.getElementById("numExited").textContent =
           "Number of exited passengers: " + exitedPassengers + ".";
         listTimeToClear.push(Number(passenger.timeTaken));
         let newAvg =
           listTimeToClear.reduce((a, b) => a + b) / listTimeToClear.length;
         listMeanTimeToClear.push(newAvg);
-        document.getElementById("aveAll").innerHTML =
+        document.getElementById("aveAll").textContent =
           "Average time taken by a passenger: " +
           newAvg.toFixed(2) +
           ". Average time taken for " +
@@ -981,7 +981,7 @@ function redrawWindow() {
     overallAvg = 0;
     overallStdDev = 0;
   }
-  document.getElementById("time").innerHTML =
+  document.getElementById("time").textContent =
     "Current time is " +
     currentTime +
     " seconds or " +
@@ -989,9 +989,9 @@ function redrawWindow() {
     " minutes or " +
     (currentTime / 3600).toFixed(2) +
     " hours.";
-  document.getElementById("numExited").innerHTML =
+  document.getElementById("numExited").textContent =
     "Number of exited passengers: " + exitedPassengers + ".";
-  document.getElementById("aveAll").innerHTML =
+  document.getElementById("aveAll").textContent =
     "Average time taken by a passenger: " +
     0 +
     ". Average time taken for " +
@@ -1276,7 +1276,7 @@ function removeDynamicAgents() {
 function simStep() {
   if (isRunning) {
     currentTime += 1;
-    document.getElementById("time").innerHTML =
+    document.getElementById("time").textContent =
       "Current time is " +
       currentTime +
       " seconds or " +
