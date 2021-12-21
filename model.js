@@ -1456,8 +1456,11 @@ const layout2 = {
   },
   paper_bgcolor: "rgba(0,0,0,0)",
   plot_bgcolor: "rgba(0,0,0,0)",
-  xaxis: { title: "Number of simulations", rangemode: "tozero"},
-  yaxis: { title: "Average time taken per simulation (s)", rangemode: "tozero" },
+  xaxis: { title: "Number of simulations", rangemode: "tozero" },
+  yaxis: {
+    title: "Average time taken per simulation (s)",
+    rangemode: "tozero",
+  },
   font: { family: "Graphik", size: 11 },
 };
 
