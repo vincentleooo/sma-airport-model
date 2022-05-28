@@ -1447,7 +1447,7 @@ const layout1 = {
   plot_bgcolor: "rgba(0,0,0,0)",
   xaxis: { title: "Number of passengers", rangemode: "tozero" },
   yaxis: { title: "Average time taken per passenger (s)", rangemode: "tozero" },
-  font: { family: "Graphik", size: 11 },
+  font: { family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif", size: 11 },
 };
 
 const layout2 = {
@@ -1461,7 +1461,7 @@ const layout2 = {
     title: "Average time taken per simulation (s)",
     rangemode: "tozero",
   },
-  font: { family: "Graphik", size: 11 },
+  font: { family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif", size: 11 },
 };
 
 // plot all charts
